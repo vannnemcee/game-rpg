@@ -96,18 +96,21 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       keysRef.current[e.code] = false;
     };
 
-    // Right-Click Attack for Desktop (button === 2)
+    // Left-Click (and Right-Click) Attack for Desktop
     const handleMouseDown = (e: MouseEvent) => {
-      if (e.button === 2) {
-        e.preventDefault();
+      if (e.button === 0 || e.button === 2) {
+        // Prevent attacking when clicking interactive UI elements (buttons, inputs, modals)
+        const target = e.target as HTMLElement | null;
+        if (target && (target.closest('button') || target.closest('header') || target.closest('.pointer-events-auto') || target.closest('[role="dialog"]'))) {
+          return;
+        }
         triggerAttack();
       }
     };
 
-    // Prevent context menu from popping up when right-clicking to attack
+    // Prevent context menu from popping up during gameplay
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
-      triggerAttack();
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -788,7 +791,11 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         ref={canvasRef}
         onContextMenu={(e) => {
           e.preventDefault();
-          triggerAttack();
+        }}
+        onPointerDown={(e) => {
+          if (e.button === 0 || e.button === 2) {
+            triggerAttack();
+          }
         }}
         className="w-full h-full block pixelated cursor-crosshair"
       />

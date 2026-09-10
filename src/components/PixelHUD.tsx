@@ -251,7 +251,7 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
             id="attack-btn"
             onClick={onAttackButton}
             className="w-14 h-14 sm:w-16 sm:h-16 pixel-btn-amber flex flex-col items-center justify-center cursor-pointer active:scale-95 shadow-xl rounded-xs"
-            title="Tebas Pedang (Klik Kanan Mouse / SPASI)"
+            title="Tebas Pedang (Klik Kiri Mouse / SPASI)"
           >
             <Sword className="w-6 h-6 sm:w-7 sm:h-7 text-amber-200" />
             <span className="text-[8px] sm:text-[9px] font-pixel text-amber-100 tracking-wider">

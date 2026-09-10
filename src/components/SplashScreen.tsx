@@ -307,7 +307,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
       {/* Footer Info */}
       <footer className="relative z-10 w-full py-1.5 sm:py-2.5 text-center text-emerald-300/85 text-[9px] sm:text-[11px] font-pixel bg-black/60 border-t border-emerald-900/60 flex-shrink-0 mt-1">
-        WASD/Panah: Jalan • <span className="text-amber-300 font-bold">Tahan SHIFT</span>: Lari • <span className="text-amber-200 font-bold">KLIK KANAN MOUSE / SPASI</span>: Serang • E: Potion • I: Tas
+        WASD/Panah: Jalan • <span className="text-amber-300 font-bold">Tahan SHIFT</span>: Lari • <span className="text-amber-200 font-bold">KLIK KIRI MOUSE / SPASI</span>: Serang • E: Potion • I: Tas
       </footer>
 
       {/* How To Play Modal */}
@@ -325,7 +325,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 <ul className="space-y-1.5">
                   <li>• <strong className="text-white">W, A, S, D</strong> atau <strong className="text-white">Tombol Panah</strong>: Menggerakkan Rubah</li>
                   <li>• <strong className="text-amber-300">Tahan SHIFT</strong> (atau tombol Lari): Lari Cepat / Sprint</li>
-                  <li>• <strong className="text-amber-200">Klik Kanan Mouse / SPASI</strong>: Menebas pedang menyerang monster (Desktop)</li>
+                  <li>• <strong className="text-amber-200">Klik Kiri Mouse / SPASI</strong>: Menebas pedang menyerang monster (Desktop)</li>
                   <li>• <strong className="text-white">E</strong>: Meminum Ramuan Health Potion (+50 HP)</li>
                   <li>• <strong className="text-white">I / B</strong>: Buka & Tutup Tas Inventory</li>
                   <li>• Tersedia D-Pad & Tombol Sentuh Virtual untuk HP / Layar Sentuh!</li>
