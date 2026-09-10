@@ -250,6 +250,9 @@ export class SpriteRenderer {
       case 'slime':
         this.drawSlime(ctx, s, time, enemy);
         break;
+      case 'giant_slime_boss':
+        this.drawGiantSlimeBoss(ctx, s, time, enemy);
+        break;
       case 'forest_monster':
         this.drawForestMonster(ctx, s, time, enemy);
         break;
@@ -317,6 +320,96 @@ export class SpriteRenderer {
 
     // Cheerful mouth
     P(-1, 0, 2, 1, '#102213');
+  }
+
+  // 1.5. Giant Slime Boss (King Slime - Level 5 Boss)
+  private static drawGiantSlimeBoss(ctx: CanvasRenderingContext2D, s: number, time: number, enemy: Enemy) {
+    const bounce = Math.abs(Math.sin(time * 5));
+    const squashX = 1 + bounce * 0.22;
+    const squashY = 1 - bounce * 0.22;
+
+    ctx.scale(squashX, squashY);
+
+    const P = (x: number, y: number, w: number, h: number, col: string) => {
+      this.px(ctx, x * s, y * s, w * s, h * s, col);
+    };
+
+    // Deep Royal Emerald & Jelly Gradient
+    const SLIME_BASE = '#0d3814';
+    const SLIME_DARK = '#1a5923';
+    const SLIME_MID = '#2ba03d';
+    const SLIME_LIGHT = '#4ae363';
+    const SLIME_GLOSS = '#99ffaa';
+    const SLIME_CORE = '#207831';
+
+    // Royal Crown colors
+    const GOLD_DARK = '#8a6508';
+    const GOLD_MID = '#f59e0b';
+    const GOLD_LIGHT = '#fde047';
+    const RUBY_RED = '#dc2626';
+    const RUBY_GLOW = '#f87171';
+
+    // Massive slime body
+    P(-20, 6, 40, 10, SLIME_BASE);
+    P(-22, 0, 44, 8, SLIME_DARK);
+    P(-24, -8, 48, 10, SLIME_MID);
+    P(-22, -18, 44, 12, SLIME_MID);
+    P(-18, -26, 36, 10, SLIME_LIGHT);
+    P(-12, -32, 24, 8, SLIME_GLOSS);
+
+    // Inner Jelly Core & bubbles
+    P(-14, -14, 28, 14, SLIME_CORE);
+    const bub1 = Math.sin(time * 4) * 2;
+    const bub2 = Math.cos(time * 3.5) * 2;
+    P(-10, -10 + bub1, 4, 4, SLIME_LIGHT);
+    P(6, -8 + bub2, 5, 5, SLIME_LIGHT);
+    P(-4, -16, 3, 3, SLIME_GLOSS);
+
+    // Large Glossy Highlights on top-left
+    P(-16, -24, 8, 4, SLIME_GLOSS);
+    P(-12, -28, 6, 3, '#ffffff');
+
+    // Menacing Boss Eyes with golden & crimson glow
+    const eyeAnim = Math.sin(time * 6) > 0.95 ? 1 : 4;
+    P(-12, -12, 6, eyeAnim, '#061709');
+    P(-10, -12, 3, Math.max(1, eyeAnim - 1), '#fbbf24');
+    P(-9, -12, 1, 1, '#ffffff');
+
+    P(6, -12, 6, eyeAnim, '#061709');
+    P(7, -12, 3, Math.max(1, eyeAnim - 1), '#fbbf24');
+    P(8, -12, 1, 1, '#ffffff');
+
+    // Huge Boss Mouth with fangs
+    P(-8, -3, 16, 3, '#061709');
+    P(-6, -3, 3, 2, '#ffffff');
+    P(3, -3, 3, 2, '#ffffff');
+
+    // Giant Golden Royal Crown on Head!
+    const crownBob = -32 - Math.sin(time * 5) * 2;
+    P(-14, crownBob, 28, 4, GOLD_DARK);
+    P(-13, crownBob + 1, 26, 2, GOLD_MID);
+
+    // Crown Spikes (3 royal peaks)
+    P(-13, crownBob - 8, 5, 8, GOLD_MID);
+    P(-12, crownBob - 10, 3, 3, GOLD_LIGHT);
+    P(-4, crownBob - 14, 8, 14, GOLD_MID);
+    P(-3, crownBob - 17, 6, 4, GOLD_LIGHT);
+    P(8, crownBob - 8, 5, 8, GOLD_MID);
+    P(9, crownBob - 10, 3, 3, GOLD_LIGHT);
+
+    // Large Central Ruby Gem in Crown
+    P(-3, crownBob - 8, 6, 6, RUBY_RED);
+    P(-2, crownBob - 7, 3, 3, RUBY_GLOW);
+    P(-1, crownBob - 6, 1, 1, '#ffffff');
+
+    // Side rubies
+    P(-11, crownBob - 3, 2, 2, RUBY_RED);
+    P(9, crownBob - 3, 2, 2, RUBY_RED);
+
+    // Slime Droplets dripping
+    const drop = (time * 12) % 18;
+    P(-20, 10 + drop, 3, 4, SLIME_MID);
+    P(18, 8 + drop * 0.8, 3, 4, SLIME_LIGHT);
   }
 
   // 2. Monster Hutan (Horned Forest Beast / Wild Bramble Goblin)

@@ -18,6 +18,7 @@ interface GameCanvasProps {
   onIncrementMonstersDefeated: () => void;
   onIncrementCoins: (amount: number) => void;
   onIncrementCrystals: (amount: number) => void;
+  onUpdateBoss?: (boss: { name: string; hp: number; maxHp: number; type: string; isDead: boolean } | null) => void;
 }
 
 export const GameCanvas: React.FC<GameCanvasProps> = ({
@@ -35,6 +36,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   onIncrementMonstersDefeated,
   onIncrementCoins,
   onIncrementCrystals,
+  onUpdateBoss,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -77,6 +79,21 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
     // Play level BGM
     sound.startBGM(levelConfig.levelNumber);
+
+    // Check if level has a boss (Level 5 King Slime)
+    const boss = enemiesRef.current.find((e) => e.type === 'giant_slime_boss' && !e.isDead);
+    if (boss) {
+      onUpdateBoss?.({
+        name: boss.name,
+        hp: boss.hp,
+        maxHp: boss.maxHp,
+        type: boss.type,
+        isDead: boss.isDead,
+      });
+      sound.playBossRoar();
+    } else {
+      onUpdateBoss?.(null);
+    }
   }, [levelConfig]);
 
   // Keyboard and Mouse Event Listeners
@@ -173,13 +190,15 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       const dy = enemy.y - p.y;
       const dist = Math.hypot(dx, dy);
 
-      // Hit sector cone check in facing direction
+      // Hit sector cone check in facing direction (boss has larger hit boundary)
+      const hitRadius = enemy.type === 'giant_slime_boss' ? 95 : 64;
+      const hitSpan = enemy.type === 'giant_slime_boss' ? 60 : 40;
       let inSector = false;
-      if (dist < 64) {
-        if (p.facing === 'right' && dx > -10 && Math.abs(dy) < 40) inSector = true;
-        if (p.facing === 'left' && dx < 10 && Math.abs(dy) < 40) inSector = true;
-        if (p.facing === 'down' && dy > -10 && Math.abs(dx) < 40) inSector = true;
-        if (p.facing === 'up' && dy < 10 && Math.abs(dx) < 40) inSector = true;
+      if (dist < hitRadius) {
+        if (p.facing === 'right' && dx > -15 && Math.abs(dy) < hitSpan) inSector = true;
+        if (p.facing === 'left' && dx < 15 && Math.abs(dy) < hitSpan) inSector = true;
+        if (p.facing === 'down' && dy > -15 && Math.abs(dx) < hitSpan) inSector = true;
+        if (p.facing === 'up' && dy < 15 && Math.abs(dx) < hitSpan) inSector = true;
       }
 
       if (inSector) {
@@ -190,19 +209,32 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         enemy.hp -= damage;
         enemy.hurtTimer = 0.25;
 
-        // Knockback
+        // Knockback (boss is heavier)
         const pushAngle = Math.atan2(enemy.y - p.y, enemy.x - p.x);
-        enemy.vx = Math.cos(pushAngle) * 6;
-        enemy.vy = Math.sin(pushAngle) * 6;
+        const pushForce = enemy.type === 'giant_slime_boss' ? 2.5 : 6;
+        enemy.vx = Math.cos(pushAngle) * pushForce;
+        enemy.vy = Math.sin(pushAngle) * pushForce;
 
         sound.playHit();
         sound.playMonsterHurt();
+
+        // Update Boss UI stats if hitting giant slime boss
+        if (enemy.type === 'giant_slime_boss') {
+          screenShakeRef.current = Math.max(screenShakeRef.current, 6);
+          onUpdateBoss?.({
+            name: enemy.name,
+            hp: Math.max(0, enemy.hp),
+            maxHp: enemy.maxHp,
+            type: enemy.type,
+            isDead: enemy.hp <= 0,
+          });
+        }
 
         // Spawn Damage Number Particle
         particlesRef.current.push({
           id: `dmg-${Date.now()}-${Math.random()}`,
           x: enemy.x - 8,
-          y: enemy.y - 20,
+          y: enemy.y - (enemy.type === 'giant_slime_boss' ? 40 : 20),
           vx: (Math.random() - 0.5) * 1,
           vy: -1.8,
           color: isCrit ? '#f59e0b' : '#f87171',
@@ -217,7 +249,37 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         if (enemy.hp <= 0 && !enemy.isDead) {
           enemy.isDead = true;
           enemy.deathTimer = 0;
-          sound.playMonsterDefeated();
+
+          if (enemy.type === 'giant_slime_boss') {
+            sound.playBossRoar();
+            screenShakeRef.current = 18;
+            onUpdateBoss?.({
+              name: enemy.name,
+              hp: 0,
+              maxHp: enemy.maxHp,
+              type: enemy.type,
+              isDead: true,
+            });
+
+            // Mega confetti & celebratory fireworks for King Slime defeat
+            for (let pIdx = 0; pIdx < 35; pIdx++) {
+              particlesRef.current.push({
+                id: `boss-death-${Date.now()}-${pIdx}`,
+                x: enemy.x,
+                y: enemy.y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                color: ['#fbbf24', '#4ade80', '#22c55e', '#ef4444', '#f59e0b', '#ffffff'][pIdx % 6],
+                size: 4 + Math.random() * 5,
+                life: 1.2,
+                maxLife: 1.2,
+                type: 'confetti',
+              });
+            }
+          } else {
+            sound.playMonsterDefeated();
+          }
+
           onIncrementMonstersDefeated();
 
           // Spawn Death Dust Particles
@@ -420,11 +482,16 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
             enemy.y += enemy.vy;
 
             // Melee Attack Player if in contact range
-            if (dist < 26 && enemy.attackCooldown <= 0 && p.hurtTimer <= 0) {
-              enemy.attackCooldown = 1.0;
+            const isBoss = enemy.type === 'giant_slime_boss';
+            const contactDist = isBoss ? 52 : 26;
+            if (dist < contactDist && enemy.attackCooldown <= 0 && p.hurtTimer <= 0) {
+              enemy.attackCooldown = isBoss ? 1.3 : 1.0;
               p.hp = Math.max(0, p.hp - enemy.damage);
               p.hurtTimer = 0.55;
-              screenShakeRef.current = 8;
+              screenShakeRef.current = isBoss ? 14 : 8;
+              if (isBoss) {
+                sound.playBossSlam();
+              }
               sound.playPlayerHurt();
 
               // Spawn Damage text at player

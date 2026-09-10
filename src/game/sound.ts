@@ -6,6 +6,7 @@ class SoundSystem {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private isMuted: boolean = false;
+  private volume: number = 0.8;
   private activeNodes: Set<AudioNode> = new Set();
   private currentBgm: 'menu' | 1 | 2 | 3 | 4 | 5 | 6 | null = null;
   private isBgmPlaying: boolean = false;
@@ -14,8 +15,13 @@ class SoundSystem {
   constructor() {
     try {
       this.isMuted = typeof window !== 'undefined' && localStorage.getItem('foxwood_muted') === 'true';
+      const storedVol = typeof window !== 'undefined' ? localStorage.getItem('foxwood_volume') : null;
+      if (storedVol !== null) {
+        this.volume = parseFloat(storedVol) || 0.8;
+      }
     } catch {
       this.isMuted = false;
+      this.volume = 0.8;
     }
   }
 
@@ -36,8 +42,9 @@ class SoundSystem {
     if (this.ctx) {
       if (!this.masterGain) {
         this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 1, this.ctx.currentTime);
-        this.masterGain.gain.value = this.isMuted ? 0 : 1;
+        const effectiveGain = this.isMuted ? 0 : this.volume;
+        this.masterGain.gain.setValueAtTime(effectiveGain, this.ctx.currentTime);
+        this.masterGain.gain.value = effectiveGain;
         this.masterGain.connect(this.ctx.destination);
       }
 
@@ -56,8 +63,9 @@ class SoundSystem {
 
     if (!this.masterGain) {
       this.masterGain = ctx.createGain();
-      this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 1, ctx.currentTime);
-      this.masterGain.gain.value = this.isMuted ? 0 : 1;
+      const effectiveGain = this.isMuted ? 0 : this.volume;
+      this.masterGain.gain.setValueAtTime(effectiveGain, ctx.currentTime);
+      this.masterGain.gain.value = effectiveGain;
       this.masterGain.connect(ctx.destination);
     }
     return this.masterGain;
@@ -116,8 +124,8 @@ class SoundSystem {
         if (this.masterGain) {
           try {
             this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
-            this.masterGain.gain.setValueAtTime(1, this.ctx.currentTime);
-            this.masterGain.gain.value = 1;
+            this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+            this.masterGain.gain.value = this.volume;
           } catch {}
         }
       }
@@ -128,8 +136,79 @@ class SoundSystem {
     }
   }
 
+  public setVolume(vol: number) {
+    this.volume = Math.max(0, Math.min(1, vol));
+    try {
+      localStorage.setItem('foxwood_volume', this.volume.toString());
+    } catch {}
+
+    if (!this.isMuted && this.masterGain && this.ctx) {
+      try {
+        this.masterGain.gain.cancelScheduledValues(this.ctx.currentTime);
+        this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+        this.masterGain.gain.value = this.volume;
+      } catch {}
+    }
+  }
+
+  public getVolume(): number {
+    return this.volume;
+  }
+
   public getMuted(): boolean {
     return this.isMuted;
+  }
+
+  // Boss King Slime Sounds
+  public playBossRoar() {
+    if (this.isMuted) return;
+    const ctx = this.initContext();
+    const master = this.getMasterNode();
+    if (!ctx || !master) return;
+
+    try {
+      const now = ctx.currentTime;
+      // Heavy deep rumble / roar oscillator
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(70, now);
+      osc.frequency.exponentialRampToValueAtTime(35, now + 0.8);
+
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.85);
+
+      osc.connect(gain);
+      gain.connect(master);
+      this.registerNode(osc);
+      osc.start(now);
+      osc.stop(now + 0.85);
+    } catch {}
+  }
+
+  public playBossSlam() {
+    if (this.isMuted) return;
+    const ctx = this.initContext();
+    const master = this.getMasterNode();
+    if (!ctx || !master) return;
+
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(110, now);
+      osc.frequency.exponentialRampToValueAtTime(25, now + 0.45);
+
+      gain.gain.setValueAtTime(0.6, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+      osc.connect(gain);
+      gain.connect(master);
+      this.registerNode(osc);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } catch {}
   }
 
   // --- Sound Effects ---

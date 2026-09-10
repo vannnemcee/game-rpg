@@ -17,7 +17,8 @@ export type EnemyType =
   | 'slime' 
   | 'forest_monster' 
   | 'mushroom_monster' 
-  | 'shadow_monster';
+  | 'shadow_monster'
+  | 'giant_slime_boss';
 
 export type CollectibleType = 'coin' | 'crystal' | 'berry' | 'potion' | 'key';
 
@@ -76,6 +77,7 @@ export interface Enemy {
   isDead: boolean;
   deathTimer: number;
   dropType: CollectibleType;
+  isBoss?: boolean;
 }
 
 export type ObstacleType = 

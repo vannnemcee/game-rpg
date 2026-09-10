@@ -1,6 +1,14 @@
 import React from 'react';
-import { Volume2, VolumeX, Pause, Play, Backpack, Heart, Shield, Sparkles, Sword } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, Backpack, Heart, Shield, Sparkles, Sword, Home } from 'lucide-react';
 import { Player, LevelConfig, InventoryItem } from '../types';
+
+export interface BossInfo {
+  name: string;
+  hp: number;
+  maxHp: number;
+  type: string;
+  isDead: boolean;
+}
 
 interface PixelHUDProps {
   player: Player;
@@ -9,6 +17,7 @@ interface PixelHUDProps {
   isMuted: boolean;
   isPaused: boolean;
   isSprinting: boolean;
+  activeBoss?: BossInfo | null;
   onToggleMute: () => void;
   onTogglePause: () => void;
   onOpenInventory: () => void;
@@ -16,6 +25,7 @@ interface PixelHUDProps {
   onAttackButton: () => void;
   onToggleSprint: (sprinting: boolean) => void;
   onDirectionInput: (dir: 'up' | 'down' | 'left' | 'right' | null) => void;
+  onMainMenu: () => void;
 }
 
 export const PixelHUD: React.FC<PixelHUDProps> = ({
@@ -25,6 +35,7 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
   isMuted,
   isPaused,
   isSprinting,
+  activeBoss,
   onToggleMute,
   onTogglePause,
   onOpenInventory,
@@ -32,6 +43,7 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
   onAttackButton,
   onToggleSprint,
   onDirectionInput,
+  onMainMenu,
 }) => {
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
   const potionItem = inventory.find((i) => i.type === 'potion');
@@ -79,16 +91,80 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
           </div>
         </div>
 
-        {/* Center: Current Level Badge */}
-        <div className="hidden sm:flex flex-col items-center">
-          <div className="pixel-box-dark px-4 py-1.5 border-2 border-emerald-600/80 text-center">
-            <div className="text-[11px] font-pixel text-amber-300 tracking-wider">
-              {levelConfig.title}
+        {/* Center: Boss Big Heart UI (or Level Badge) */}
+        <div className="flex flex-col items-center max-w-[220px] sm:max-w-xs md:max-w-md w-full mx-2 pointer-events-auto">
+          {activeBoss && !activeBoss.isDead ? (
+            <div className="pixel-box-gold w-full px-3 py-1.5 sm:px-4 sm:py-2 flex flex-col items-center bg-black/85 border-2 border-amber-400 shadow-2xl animate-fade-in">
+              {/* Boss Name Header */}
+              <div className="flex items-center gap-1.5 text-[9px] sm:text-xs font-pixel text-amber-300 tracking-wider text-center drop-shadow">
+                <span>👑</span>
+                <span>{activeBoss.name}</span>
+              </div>
+
+              {/* BIG HEART UI DI TENGAH-TENGAH */}
+              <div className="flex items-center justify-center gap-2 sm:gap-3 my-0.5 sm:my-1">
+                {/* Big Pulsating Center Heart */}
+                <div className="relative flex items-center justify-center">
+                  <Heart
+                    className={`w-7 h-7 sm:w-9 sm:h-9 text-red-500 fill-red-500 transition-transform ${
+                      activeBoss.hp < activeBoss.maxHp * 0.3 ? 'animate-bounce' : 'animate-pulse'
+                    }`}
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[9px] font-pixel font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                    {Math.round((activeBoss.hp / activeBoss.maxHp) * 100)}%
+                  </span>
+                </div>
+
+                {/* 10 Hearts Gauge Bar */}
+                <div className="hidden xs:flex items-center gap-0.5 sm:gap-1">
+                  {Array.from({ length: 10 }).map((_, hIdx) => {
+                    const threshold = (hIdx + 1) * (activeBoss.maxHp / 10);
+                    const isFull = activeBoss.hp >= threshold;
+                    const isHalf = !isFull && activeBoss.hp >= threshold - activeBoss.maxHp / 20;
+                    return (
+                      <span
+                        key={hIdx}
+                        className={`text-xs sm:text-sm transition-all ${
+                          isFull
+                            ? 'text-red-500 scale-100 drop-shadow-[0_0_4px_rgba(239,68,68,0.8)]'
+                            : isHalf
+                            ? 'text-rose-400 opacity-90'
+                            : 'text-stone-700 opacity-40 scale-75'
+                        }`}
+                      >
+                        ❤️
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Boss Health Bar & HP Count */}
+              <div className="w-full flex items-center justify-between text-[8px] sm:text-[10px] font-pixel text-emerald-200 px-0.5 mb-0.5">
+                <span className="text-amber-300">RAJA LENDIR</span>
+                <span className="text-white font-bold">
+                  {Math.max(0, Math.floor(activeBoss.hp))} / {activeBoss.maxHp} HP
+                </span>
+              </div>
+              <div className="w-full h-2.5 sm:h-3.5 bg-black/90 border border-emerald-700 rounded-xs p-0.5 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-500 via-green-400 to-lime-300 transition-all duration-150"
+                  style={{ width: `${Math.max(0, Math.min(100, (activeBoss.hp / activeBoss.maxHp) * 100))}%` }}
+                />
+              </div>
             </div>
-            <div className="text-[9px] font-silkscreen text-emerald-300/80">
-              {levelConfig.subtitle}
+          ) : (
+            <div className="hidden sm:flex flex-col items-center">
+              <div className="pixel-box-dark px-4 py-1.5 border-2 border-emerald-600/80 text-center">
+                <div className="text-[11px] font-pixel text-amber-300 tracking-wider">
+                  {levelConfig.title}
+                </div>
+                <div className="text-[9px] font-silkscreen text-emerald-300/80">
+                  {levelConfig.subtitle}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right: Currency & Control Buttons */}
@@ -154,17 +230,35 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
 
       {/* Center Toast / Paused Overlay if paused */}
       {isPaused && (
-        <div className="self-center my-auto pointer-events-auto pixel-box p-6 text-center max-w-sm">
-          <h2 className="text-xl font-pixel text-amber-400 mb-2">GAME DIJEDA</h2>
-          <p className="text-xs font-silkscreen text-emerald-200 mb-4">
+        <div className="self-center my-auto pointer-events-auto pixel-box-dark p-6 sm:p-7 text-center max-w-sm w-full shadow-2xl border-4 border-amber-600/80 bg-black/95 animate-fade-in">
+          <div className="w-12 h-12 mx-auto mb-3 bg-amber-950/80 border-2 border-amber-500 rounded-full flex items-center justify-center text-2xl">
+            ⏸️
+          </div>
+          <h2 className="text-xl sm:text-2xl font-pixel text-amber-400 mb-1">GAME DIJEDA</h2>
+          <p className="text-xs font-silkscreen text-emerald-200/90 mb-5">
             Beristirahat sejenak di bawah naungan pohon hutan.
           </p>
-          <button
-            onClick={onTogglePause}
-            className="pixel-btn-amber px-6 py-2.5 text-xs font-pixel cursor-pointer"
-          >
-            LANJUTKAN
-          </button>
+
+          {/* TWO PAUSE BUTTONS AS REQUESTED: 1. Lanjutkan, 2. Kembali ke menu */}
+          <div className="flex flex-col gap-2.5">
+            <button
+              id="pause-continue-btn"
+              onClick={onTogglePause}
+              className="pixel-btn-amber py-3 px-6 text-xs sm:text-sm font-pixel flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition tracking-wider"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              LANJUTKAN
+            </button>
+
+            <button
+              id="pause-main-menu-btn"
+              onClick={onMainMenu}
+              className="pixel-btn py-3 px-6 text-xs sm:text-sm font-pixel flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition tracking-wider bg-stone-800 border-stone-600 hover:bg-stone-700"
+            >
+              <Home className="w-4 h-4" />
+              KEMBALI KE MENU
+            </button>
+          </div>
         </div>
       )}
 

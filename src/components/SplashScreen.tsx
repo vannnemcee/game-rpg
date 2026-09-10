@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Play, HelpCircle, Volume2, VolumeX, Shield, Sparkles } from 'lucide-react';
+import { Play, HelpCircle, Volume2, VolumeX, Shield, Sparkles, Settings, X, Sliders, CheckCircle2 } from 'lucide-react';
 import { sound } from '../game/sound';
 
 interface SplashScreenProps {
@@ -15,6 +15,22 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [volume, setVolumeState] = useState<number>(() => sound.getVolume());
+  const [screenShakeEnabled, setScreenShakeEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('foxwood_screenshake') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  const [particlesEnabled, setParticlesEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('foxwood_particles') !== 'false';
+    } catch {
+      return true;
+    }
+  });
 
   useEffect(() => {
     sound.startBGM('menu');
@@ -237,10 +253,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       <header className="relative z-10 w-full max-w-5xl px-3 sm:px-6 pt-1 sm:pt-4 flex justify-between items-center flex-shrink-0">
         <div className="flex items-center gap-2 px-2.5 py-1 bg-black/60 border-2 border-emerald-800 rounded-sm text-[10px] sm:text-xs text-emerald-300 font-pixel">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
-          FOXWOOD TALE v1.2 • 6 LEVELS
+          FOXWOOD TALE v1.5 • KING SLIME BOSS
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <button
             id="sound-toggle-btn"
             onClick={() => {
@@ -253,78 +269,268 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
           </button>
 
           <button
-            id="help-btn"
+            id="header-settings-btn"
             onClick={() => {
               sound.playUiClick();
-              setShowHowToPlay(true);
+              setShowSettings(true);
             }}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-700 text-emerald-200 text-[10px] sm:text-xs font-pixel rounded-sm cursor-pointer transition shadow-md"
+            className="p-2 sm:p-2.5 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-700 text-emerald-300 rounded-sm cursor-pointer transition shadow-md"
+            title="Pengaturan"
           >
-            <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
-            KONTROL
+            <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300" />
           </button>
         </div>
       </header>
 
-      {/* Center Hero Title & Start Button - Compact on short screens / mobile landscape */}
-      <main className="relative z-10 flex flex-col items-center text-center px-2 sm:px-4 my-auto py-1 sm:py-4 max-w-2xl flex-shrink-0">
+      {/* Center Hero Title & Main Menu Buttons */}
+      <main className="relative z-10 flex flex-col items-center text-center px-2 sm:px-4 my-auto py-1 sm:py-3 max-w-2xl flex-shrink-0">
         {/* Title Badge */}
         <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-1 sm:mb-2 bg-amber-950/80 border-2 border-amber-600/70 text-amber-300 text-[10px] sm:text-xs font-pixel tracking-wider shadow-lg">
           <Sparkles className="w-3 h-3 text-amber-400 animate-spin" />
-          PETUALANGAN RUBAH DI HUTAN MONSTER
+          PETUALANGAN RUBAH DI HUTAN MONSTER v1.5
         </div>
 
         {/* Main Pixel Title */}
-        <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold font-pixel tracking-tight text-white drop-shadow-[0_4px_0_#14351b] mb-1 sm:mb-2">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold font-pixel tracking-tight text-white drop-shadow-[0_4px_0_#14351b] mb-1">
           FOXWOOD TALE
         </h1>
 
-        <p className="max-w-lg text-emerald-200 text-[11px] sm:text-xs md:text-sm font-silkscreen mb-1.5 sm:mb-3 px-3 py-1 bg-black/40 border border-emerald-900/60 rounded">
-          Bimbing <span className="text-orange-400 font-bold">Kiko si Rubah Pemberani</span> melewati hutan berbahaya, basmi monster, dan temukan jalan keluar!
+        <p className="max-w-lg text-emerald-200 text-[11px] sm:text-xs md:text-sm font-silkscreen mb-1 sm:mb-2.5 px-3 py-1 bg-black/40 border border-emerald-900/60 rounded">
+          Bimbing <span className="text-orange-400 font-bold">Kiko si Rubah Pemberani</span> menghadapi monster & bos raksasa King Slime di Level 5!
         </p>
 
         {/* Character Card Preview */}
-        <div className="flex items-center gap-2.5 px-3 py-1 mb-2 sm:mb-4 bg-black/60 border-2 border-emerald-800 rounded-sm">
-          <div className="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center bg-orange-950 border-2 border-orange-600 rounded">
-            <span className="text-base sm:text-xl">🦊</span>
+        <div className="flex items-center gap-2.5 px-3 py-1 mb-2 sm:mb-3 bg-black/60 border-2 border-emerald-800 rounded-sm">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-orange-950 border-2 border-orange-600 rounded">
+            <span className="text-base sm:text-lg">🦊</span>
           </div>
           <div className="text-left">
             <div className="text-[10px] sm:text-xs font-pixel text-orange-400">Kiko The Brave Fox</div>
-            <div className="text-[9px] sm:text-[11px] text-emerald-300 font-silkscreen">HP: 100 • Pedang Kayu Magis</div>
+            <div className="text-[9px] sm:text-[10px] text-emerald-300 font-silkscreen">HP: 100 • Pedang Kayu Magis • 6 Dunia</div>
           </div>
         </div>
 
-        {/* Start Game Button (Prominent & Always visible on phone landscape) */}
-        <button
-          id="start-game-btn"
-          onClick={handleStart}
-          className="pixel-btn-amber px-6 py-2.5 sm:px-10 sm:py-3.5 text-xs sm:text-base md:text-lg font-pixel flex items-center gap-2 tracking-wider cursor-pointer group shadow-2xl active:scale-95"
-        >
-          <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current group-hover:translate-x-1 transition-transform" />
-          START ADVENTURE
-        </button>
+        {/* MAIN MENU BUTTONS AS REQUESTED: Start Adventure, How to Play, Settings */}
+        <div className="flex flex-col gap-2 w-full max-w-xs sm:max-w-sm">
+          {/* 1. START ADVENTURE */}
+          <button
+            id="start-game-btn"
+            onClick={handleStart}
+            className="pixel-btn-amber py-2.5 sm:py-3 px-6 text-xs sm:text-sm md:text-base font-pixel flex items-center justify-center gap-2 tracking-wider cursor-pointer group shadow-2xl active:scale-95 transition"
+          >
+            <Play className="w-4 h-4 fill-current group-hover:translate-x-1 transition-transform" />
+            START ADVENTURE
+          </button>
+
+          {/* 2. HOW TO PLAY & 3. SETTINGS in grid / row */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              id="how-to-play-btn"
+              onClick={() => {
+                sound.playUiClick();
+                setShowHowToPlay(true);
+              }}
+              className="pixel-btn py-2 sm:py-2.5 px-2 text-[10px] sm:text-xs font-pixel flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition bg-emerald-950/90 border-emerald-700 text-emerald-200 hover:bg-emerald-900"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+              HOW TO PLAY
+            </button>
+
+            <button
+              id="settings-btn"
+              onClick={() => {
+                sound.playUiClick();
+                setShowSettings(true);
+              }}
+              className="pixel-btn py-2 sm:py-2.5 px-2 text-[10px] sm:text-xs font-pixel flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition bg-stone-900 border-amber-600/70 text-amber-300 hover:bg-stone-800"
+            >
+              <Settings className="w-3.5 h-3.5 text-amber-400" />
+              PENGATURAN
+            </button>
+          </div>
+        </div>
       </main>
 
       {/* Footer Info */}
-      <footer className="relative z-10 w-full py-1.5 sm:py-2.5 text-center text-emerald-300/85 text-[9px] sm:text-[11px] font-pixel bg-black/60 border-t border-emerald-900/60 flex-shrink-0 mt-1">
+      <footer className="relative z-10 w-full py-1 sm:py-2 text-center text-emerald-300/85 text-[9px] sm:text-[10px] font-pixel bg-black/60 border-t border-emerald-900/60 flex-shrink-0 mt-1">
         WASD/Panah: Jalan • <span className="text-amber-300 font-bold">Tahan SHIFT</span>: Lari • <span className="text-amber-200 font-bold">KLIK KIRI MOUSE / SPASI</span>: Serang • E: Potion • I: Tas
       </footer>
 
-      {/* How To Play Modal */}
-      {showHowToPlay && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-          <div className="pixel-box max-w-lg w-full p-6 text-white relative max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-pixel text-amber-400 mb-4 pb-2 border-b-2 border-emerald-800 flex items-center gap-2">
-              <Shield className="w-5 h-5 text-amber-400" />
-              PANDUAN BERMAIN v1.2
-            </h2>
+      {/* SETTINGS MODAL */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3 sm:p-4 backdrop-blur-xs animate-fade-in">
+          <div className="pixel-box-dark max-w-md w-full p-5 sm:p-6 text-white relative max-h-[90vh] overflow-y-auto border-4 border-amber-600/80 bg-stone-950/95 shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-emerald-800">
+              <div className="flex items-center gap-2 text-amber-400 font-pixel text-sm sm:text-base">
+                <Sliders className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                <span>PENGATURAN GAME</span>
+              </div>
+              <button
+                id="close-settings-x-btn"
+                onClick={() => {
+                  sound.playUiClick();
+                  setShowSettings(false);
+                }}
+                className="p-1 hover:bg-emerald-900 text-stone-400 hover:text-white rounded cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
             <div className="space-y-4 text-xs font-silkscreen text-emerald-100">
-              <div className="bg-black/40 p-3 border border-emerald-900 rounded">
-                <div className="font-pixel text-amber-300 mb-2">🎮 KONTROL PERMAINAN:</div>
-                <ul className="space-y-1.5">
-                  <li>• <strong className="text-white">W, A, S, D</strong> atau <strong className="text-white">Tombol Panah</strong>: Menggerakkan Rubah</li>
-                  <li>• <strong className="text-amber-300">Tahan SHIFT</strong> (atau tombol Lari): Lari Cepat / Sprint</li>
+              {/* Master Volume */}
+              <div className="bg-black/60 p-3.5 border-2 border-emerald-900/80 rounded-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-pixel text-amber-300 flex items-center gap-1.5 text-[11px]">
+                    <Volume2 className="w-4 h-4 text-emerald-400" />
+                    VOLUME MASTER
+                  </span>
+                  <span className="font-pixel text-amber-400 text-xs">{Math.round(volume * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={volume}
+                  onChange={(e) => {
+                    const newVol = parseFloat(e.target.value);
+                    setVolumeState(newVol);
+                    sound.setVolume(newVol);
+                  }}
+                  className="w-full accent-amber-500 cursor-pointer h-2 bg-stone-800 rounded"
+                />
+                <div className="flex justify-between text-[9px] text-stone-400 mt-1">
+                  <span>0% (Sunyi)</span>
+                  <span>50%</span>
+                  <span>100% (Maksimal)</span>
+                </div>
+              </div>
+
+              {/* Mute Audio Switch */}
+              <div className="bg-black/60 p-3.5 border-2 border-emerald-900/80 rounded-sm flex items-center justify-between">
+                <div>
+                  <div className="font-pixel text-amber-300 text-[11px]">STATUS AUDIO / BGM</div>
+                  <div className="text-[10px] text-emerald-300/80">Musik retro dan efek suara pertarungan</div>
+                </div>
+                <button
+                  onClick={() => {
+                    onToggleMute();
+                    sound.playUiClick();
+                  }}
+                  className={`px-3 py-1.5 font-pixel text-[10px] rounded cursor-pointer transition ${
+                    isMuted
+                      ? 'bg-red-950 border-2 border-red-600 text-red-300'
+                      : 'bg-emerald-950 border-2 border-emerald-500 text-emerald-300'
+                  }`}
+                >
+                  {isMuted ? '🔇 BISU (MUTED)' : '🔊 SUARA AKTIF'}
+                </button>
+              </div>
+
+              {/* Screen Shake Toggle */}
+              <div className="bg-black/60 p-3.5 border-2 border-emerald-900/80 rounded-sm flex items-center justify-between">
+                <div>
+                  <div className="font-pixel text-amber-300 text-[11px]">EFEK GOYANG LAYAR</div>
+                  <div className="text-[10px] text-emerald-300/80">Goncangan saat terkena pukulan atau serangan bos</div>
+                </div>
+                <button
+                  onClick={() => {
+                    sound.playUiClick();
+                    const next = !screenShakeEnabled;
+                    setScreenShakeEnabled(next);
+                    try {
+                      localStorage.setItem('foxwood_screenshake', next ? 'true' : 'false');
+                    } catch {}
+                  }}
+                  className={`px-3 py-1.5 font-pixel text-[10px] rounded cursor-pointer transition ${
+                    screenShakeEnabled
+                      ? 'bg-emerald-950 border-2 border-emerald-500 text-emerald-300'
+                      : 'bg-stone-800 border-2 border-stone-600 text-stone-400'
+                  }`}
+                >
+                  {screenShakeEnabled ? 'AKTIF' : 'NONAKTIF'}
+                </button>
+              </div>
+
+              {/* Ambient Particles Toggle */}
+              <div className="bg-black/60 p-3.5 border-2 border-emerald-900/80 rounded-sm flex items-center justify-between">
+                <div>
+                  <div className="font-pixel text-amber-300 text-[11px]">PARTIKEL ALAM & KUNANG-KUNANG</div>
+                  <div className="text-[10px] text-emerald-300/80">Animasi daun gugur dan kilau malam hari</div>
+                </div>
+                <button
+                  onClick={() => {
+                    sound.playUiClick();
+                    const next = !particlesEnabled;
+                    setParticlesEnabled(next);
+                    try {
+                      localStorage.setItem('foxwood_particles', next ? 'true' : 'false');
+                    } catch {}
+                  }}
+                  className={`px-3 py-1.5 font-pixel text-[10px] rounded cursor-pointer transition ${
+                    particlesEnabled
+                      ? 'bg-emerald-950 border-2 border-emerald-500 text-emerald-300'
+                      : 'bg-stone-800 border-2 border-stone-600 text-stone-400'
+                  }`}
+                >
+                  {particlesEnabled ? 'AKTIF' : 'NONAKTIF'}
+                </button>
+              </div>
+
+              {/* Version & Credits */}
+              <div className="text-center text-[10px] text-stone-400 pt-1">
+                Foxwood Tale v1.5 • Pixel Art Action Adventure
+              </div>
+            </div>
+
+            {/* Save / Close Button */}
+            <div className="mt-5 flex justify-end">
+              <button
+                id="save-settings-btn"
+                onClick={() => {
+                  sound.playUiClick();
+                  setShowSettings(false);
+                }}
+                className="pixel-btn-amber px-6 py-2.5 font-pixel text-xs cursor-pointer flex items-center gap-1.5"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                SIMPAN & TUTUP
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HOW TO PLAY MODAL */}
+      {showHowToPlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3 sm:p-4 backdrop-blur-xs animate-fade-in">
+          <div className="pixel-box max-w-lg w-full p-5 sm:p-6 text-white relative max-h-[90vh] overflow-y-auto border-4 border-emerald-700 bg-stone-950/95 shadow-2xl">
+            <div className="flex items-center justify-between pb-2.5 mb-3 border-b-2 border-emerald-800">
+              <h2 className="text-sm sm:text-base font-pixel text-amber-400 flex items-center gap-2">
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                PANDUAN BERMAIN v1.5
+              </h2>
+              <button
+                id="close-how-to-play-x-btn"
+                onClick={() => {
+                  sound.playUiClick();
+                  setShowHowToPlay(false);
+                }}
+                className="p-1 hover:bg-emerald-900 text-stone-400 hover:text-white rounded cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3.5 text-xs font-silkscreen text-emerald-100">
+              {/* Controls */}
+              <div className="bg-black/50 p-3 border-2 border-emerald-900 rounded">
+                <div className="font-pixel text-amber-300 mb-1.5 text-[11px]">🎮 KONTROL PERMAINAN:</div>
+                <ul className="space-y-1 text-[11px]">
+                  <li>• <strong className="text-white">W, A, S, D</strong> atau <strong className="text-white">Tombol Panah</strong>: Bergerak bebas di peta</li>
+                  <li>• <strong className="text-amber-300">Tahan SHIFT</strong> (atau tombol Lari): Sprint / Lari cepat</li>
                   <li>• <strong className="text-amber-200">Klik Kiri Mouse / SPASI</strong>: Menebas pedang menyerang monster (Desktop)</li>
                   <li>• <strong className="text-white">E</strong>: Meminum Ramuan Health Potion (+50 HP)</li>
                   <li>• <strong className="text-white">I / B</strong>: Buka & Tutup Tas Inventory</li>
@@ -332,31 +538,44 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 </ul>
               </div>
 
-              <div className="bg-black/40 p-3 border border-emerald-900 rounded">
-                <div className="font-pixel text-amber-300 mb-2">🗺️ PETUALANGAN 6 LEVEL:</div>
-                <ul className="space-y-1.5">
-                  <li>• <strong className="text-emerald-300">Level 1 (Forest Journey)</strong>: Pelajari dasar permainan, kumpulkan koin & kristal, lewati jembatan sungai, dan capai portal.</li>
-                  <li>• <strong className="text-purple-300">Level 2 (Monster Forest)</strong>: Hutan gelap berkabut dengan monster bayangan yang lincah.</li>
-                  <li>• <strong className="text-teal-300">Level 3 (Lembah Kabut Beracun)</strong>: Rawa beracun, jembatan rawa hijau, dan monster jamur berspora.</li>
-                  <li>• <strong className="text-orange-400">Level 4 (Reruntuhan Obsidian & Magma)</strong>: Ngarai lahar membara dan monster api.</li>
-                  <li>• <strong className="text-indigo-300">Level 5 (Benteng Bayangan Kuno)</strong>: Benteng pilar kuno dengan monster ksatria bayangan elit.</li>
-                  <li>• <strong className="text-rose-400">Level 6 (Puncak Inti Foxwood)</strong>: Final Showdown! Hadapi Lord of the Void Core dan selamatkan rimba!</li>
+              {/* Boss Feature in Level 5 */}
+              <div className="bg-amber-950/40 p-3 border-2 border-amber-600/70 rounded">
+                <div className="font-pixel text-amber-300 mb-1.5 text-[11px] flex items-center gap-1.5">
+                  <span>👑</span>
+                  <span>BOS LEVEL 5: KING SLIME & UI HEART BESAR:</span>
+                </div>
+                <p className="text-[11px] text-amber-100/90 leading-relaxed mb-1">
+                  Di Level 5 (Arena King Slime), seekor Raja Lendir raksasa menjaga gerbang benteng kuno!
+                </p>
+                <ul className="space-y-1 text-[11px] text-amber-200/90">
+                  <li>• <strong className="text-white">UI Heart Besar di Tengah Layar</strong>: Memantau kondisi nyawa bos dengan bar persentase dan indikator 10 detak jantung besar di tengah layar.</li>
+                  <li>• Serangan King Slime menimbulkan gempa lendir berkekuatan tinggi (25 DMG).</li>
+                  <li>• Kalahkan King Slime untuk merebut Kunci Kerajaan dan membuka portal rahasia!</li>
                 </ul>
               </div>
 
-              <div className="bg-black/40 p-3 border border-emerald-900 rounded">
-                <div className="font-pixel text-amber-300 mb-2">🎒 INVENTORY & JARAHAN:</div>
-                <p>Kumpulkan Koin, Kristal, Buah Liar, dan Potion dari tanah atau kalahkan monster. Buka inventory kapan saja untuk melihat jarahan dan memakai item penyembuh.</p>
+              {/* 6 Levels Recap */}
+              <div className="bg-black/50 p-3 border-2 border-emerald-900 rounded">
+                <div className="font-pixel text-amber-300 mb-1.5 text-[11px]">🗺️ PETUALANGAN 6 DUNIA:</div>
+                <ul className="space-y-1 text-[10px] text-emerald-200/90">
+                  <li>• <strong className="text-emerald-300">Level 1 (Forest Journey)</strong>: Pelajari dasar permainan & kumpulkan koin.</li>
+                  <li>• <strong className="text-purple-300">Level 2 (Monster Forest)</strong>: Hutan gelap berkabut & monster bayangan.</li>
+                  <li>• <strong className="text-teal-300">Level 3 (Lembah Kabut Beracun)</strong>: Rawa beracun & monster spora jamur.</li>
+                  <li>• <strong className="text-orange-400">Level 4 (Reruntuhan Magma)</strong>: Ngarai lahar membara.</li>
+                  <li>• <strong className="text-yellow-300">Level 5 (Arena King Slime)</strong>: Pertarungan bos Raja Lendir raksasa!</li>
+                  <li>• <strong className="text-rose-400">Level 6 (Puncak Inti Foxwood)</strong>: Final Showdown! Hadapi Lord of the Void.</li>
+                </ul>
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end">
+            <div className="mt-5 flex justify-end">
               <button
+                id="understand-how-to-play-btn"
                 onClick={() => {
                   sound.playUiClick();
                   setShowHowToPlay(false);
                 }}
-                className="pixel-btn px-6 py-2.5 font-pixel text-xs cursor-pointer"
+                className="pixel-btn-amber px-6 py-2.5 font-pixel text-xs cursor-pointer"
               >
                 MENGERTI
               </button>

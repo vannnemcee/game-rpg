@@ -10,7 +10,7 @@ import {
 } from './game/levels';
 import { sound } from './game/sound';
 import { SplashScreen } from './components/SplashScreen';
-import { PixelHUD } from './components/PixelHUD';
+import { PixelHUD, BossInfo } from './components/PixelHUD';
 import { GameCanvas } from './components/GameCanvas';
 import { InventoryModal } from './components/InventoryModal';
 import { LevelCompleteModal, GameOverModal, VictoryModal } from './components/EndScreens';
@@ -78,6 +78,7 @@ export default function App() {
   const [isInventoryOpen, setIsInventoryOpen] = useState<boolean>(false);
   const [virtualDir, setVirtualDir] = useState<Direction | null>(null);
   const [isMobileSprinting, setIsMobileSprinting] = useState<boolean>(false);
+  const [activeBoss, setActiveBoss] = useState<BossInfo | null>(null);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted((prev) => {
@@ -185,6 +186,7 @@ export default function App() {
       timeElapsedSeconds: 0,
     });
 
+    setActiveBoss(null);
     setGameScreen('PLAYING');
     setIsPaused(false);
     setIsInventoryOpen(false);
@@ -204,6 +206,7 @@ export default function App() {
 
   // Level Complete
   const handleLevelComplete = () => {
+    setActiveBoss(null);
     setGameScreen('LEVEL_COMPLETE');
   };
 
@@ -218,6 +221,7 @@ export default function App() {
     setCurrentLevel(nextLvl);
     const nextCfg = getLevelConfig(nextLvl);
     setLevelConfig(nextCfg);
+    setActiveBoss(null);
 
     // Reposition player at start of next level with health restore boost
     setPlayer((prev) => ({
@@ -237,6 +241,7 @@ export default function App() {
 
   // Game Over
   const handleGameOver = () => {
+    setActiveBoss(null);
     setGameScreen('GAME_OVER');
   };
 
@@ -244,6 +249,7 @@ export default function App() {
   const handleTryAgain = () => {
     const cfg = getLevelConfig(currentLevel);
     setLevelConfig(cfg);
+    setActiveBoss(null);
 
     setPlayer((prev) => ({
       ...prev,
@@ -262,11 +268,13 @@ export default function App() {
 
   // Victory (Reached end of Level 6)
   const handleVictory = () => {
+    setActiveBoss(null);
     setGameScreen('VICTORY');
   };
 
   // Main Menu
   const handleMainMenu = () => {
+    setActiveBoss(null);
     setGameScreen('SPLASH');
     setIsPaused(false);
     setIsInventoryOpen(false);
@@ -295,6 +303,7 @@ export default function App() {
             isMobileSprinting={isMobileSprinting}
             onUpdatePlayer={setPlayer}
             onUpdateInventory={setInventory}
+            onUpdateBoss={setActiveBoss}
             onLevelComplete={handleLevelComplete}
             onGameOver={handleGameOver}
             onVictory={handleVictory}
@@ -317,8 +326,10 @@ export default function App() {
             isMuted={isMuted}
             isPaused={isPaused}
             isSprinting={isMobileSprinting}
+            activeBoss={activeBoss}
             onToggleMute={handleToggleMute}
             onTogglePause={() => setIsPaused((prev) => !prev)}
+            onMainMenu={handleMainMenu}
             onOpenInventory={() => setIsInventoryOpen(true)}
             onQuickUsePotion={handleQuickUsePotion}
             onAttackButton={() => {
