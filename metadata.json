@@ -1,0 +1,6 @@
+{
+  "name": "Foxwood Tale: Petualangan Hutan Monster",
+  "description": "Game RPG petualangan Pixel Art bertema hutan dengan karakter rubah pemberani, melawan slime dan monster, mengumpulkan jarahan, serta sistem inventory minimalis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
