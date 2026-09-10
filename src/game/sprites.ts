@@ -26,13 +26,15 @@ export class SpriteRenderer {
 
     const s = 2; // Pixel scale factor (each logical pixel is 2x2 on canvas)
     const isAttacking = player.isAttacking;
-    const isWalking = player.animState === 'walk';
+    const isRunning = player.animState === 'run';
+    const isWalking = player.animState === 'walk' || isRunning;
     const isDead = player.hp <= 0;
 
-    // Bobbing offset for walking & breathing
-    const bob = isWalking ? Math.sin(time * 12) * 1.5 : Math.sin(time * 3) * 0.8;
-    const stepOffset = isWalking ? Math.sin(time * 12) * 2 : 0;
-    const tailWag = Math.sin(time * (isWalking ? 14 : 5)) * 3;
+    // Bobbing offset for walking, running & breathing
+    const animRate = isRunning ? 20 : 12;
+    const bob = isWalking ? Math.sin(time * animRate) * (isRunning ? 2.2 : 1.5) : Math.sin(time * 3) * 0.8;
+    const stepOffset = isWalking ? Math.sin(time * animRate) * (isRunning ? 3.5 : 2) : 0;
+    const tailWag = Math.sin(time * (isRunning ? 24 : isWalking ? 14 : 5)) * (isRunning ? 4.5 : 3);
 
     if (isDead) {
       // Dead fox lying down

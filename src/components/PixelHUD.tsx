@@ -8,11 +8,13 @@ interface PixelHUDProps {
   inventory: InventoryItem[];
   isMuted: boolean;
   isPaused: boolean;
+  isSprinting: boolean;
   onToggleMute: () => void;
   onTogglePause: () => void;
   onOpenInventory: () => void;
   onQuickUsePotion: () => void;
   onAttackButton: () => void;
+  onToggleSprint: (sprinting: boolean) => void;
   onDirectionInput: (dir: 'up' | 'down' | 'left' | 'right' | null) => void;
 }
 
@@ -22,11 +24,13 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
   inventory,
   isMuted,
   isPaused,
+  isSprinting,
   onToggleMute,
   onTogglePause,
   onOpenInventory,
   onQuickUsePotion,
   onAttackButton,
+  onToggleSprint,
   onDirectionInput,
 }) => {
   const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
@@ -207,18 +211,36 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
           </button>
         </div>
 
-        {/* Action Controls on Bottom Right (Sword Attack, Drink Potion) */}
-        <div className="pointer-events-auto flex items-end gap-3 select-none">
+        {/* Action Controls on Bottom Right (Sprint, Potion, Sword Attack) */}
+        <div className="pointer-events-auto flex items-end gap-2 sm:gap-3 select-none">
+          {/* Sprint / Lari Cepat Button (Shift) */}
+          <button
+            id="sprint-btn"
+            onPointerDown={() => onToggleSprint(true)}
+            onPointerUp={() => onToggleSprint(false)}
+            onPointerLeave={() => onToggleSprint(false)}
+            onClick={() => onToggleSprint(!isSprinting)}
+            className={`w-11 h-11 sm:w-13 sm:h-13 flex flex-col items-center justify-center cursor-pointer active:scale-95 transition-all rounded-xs ${
+              isSprinting ? 'pixel-btn-amber ring-2 ring-amber-300' : 'pixel-box-dark text-emerald-300 hover:text-white'
+            }`}
+            title="Lari Cepat / Sprint (Tahan SHIFT)"
+          >
+            <span className="text-sm sm:text-base">⚡</span>
+            <span className="text-[7px] sm:text-[8px] font-pixel text-amber-200">
+              {isSprinting ? 'LARI ON' : 'LARI'}
+            </span>
+          </button>
+
           {/* Potion Quick Button */}
           <button
             onClick={onQuickUsePotion}
-            className="w-14 h-14 pixel-btn-red flex flex-col items-center justify-center cursor-pointer active:scale-95 relative"
-            title="Minum Potion (+50 HP)"
+            className="w-11 h-11 sm:w-13 sm:h-13 pixel-btn-red flex flex-col items-center justify-center cursor-pointer active:scale-95 relative rounded-xs"
+            title="Minum Potion (+50 HP) [E]"
           >
-            <span className="text-xl">🧪</span>
-            <span className="text-[9px] font-pixel text-white">E</span>
+            <span className="text-base sm:text-lg">🧪</span>
+            <span className="text-[7px] sm:text-[8px] font-pixel text-white">E</span>
             {potionCount > 0 && (
-              <span className="absolute -top-1 -right-1 px-1.5 py-0.2 bg-amber-400 text-black text-[9px] font-pixel font-bold rounded-full border border-black">
+              <span className="absolute -top-1 -right-1 px-1 py-0.1 bg-amber-400 text-black text-[8px] font-pixel font-bold rounded-full border border-black">
                 {potionCount}
               </span>
             )}
@@ -228,12 +250,12 @@ export const PixelHUD: React.FC<PixelHUDProps> = ({
           <button
             id="attack-btn"
             onClick={onAttackButton}
-            className="w-18 h-18 pixel-btn-amber flex flex-col items-center justify-center cursor-pointer active:scale-95 shadow-xl"
-            title="Tebas Pedang (SPASI)"
+            className="w-14 h-14 sm:w-16 sm:h-16 pixel-btn-amber flex flex-col items-center justify-center cursor-pointer active:scale-95 shadow-xl rounded-xs"
+            title="Tebas Pedang (Klik Kanan Mouse / SPASI)"
           >
-            <Sword className="w-8 h-8 text-amber-200" />
-            <span className="text-[10px] font-pixel text-amber-100 tracking-wider">
-              SPASI
+            <Sword className="w-6 h-6 sm:w-7 sm:h-7 text-amber-200" />
+            <span className="text-[8px] sm:text-[9px] font-pixel text-amber-100 tracking-wider">
+              SERANG
             </span>
           </button>
         </div>

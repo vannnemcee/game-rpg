@@ -1,13 +1,21 @@
 @import "tailwindcss";
 
 @layer base {
+  html, body {
+    width: 100%;
+    min-height: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
   body {
     font-family: 'Silkscreen', 'Press Start 2P', monospace, sans-serif;
     user-select: none;
     -webkit-user-select: none;
-    overflow: hidden;
+    overflow-x: hidden;
     background-color: #0b130e;
     color: #e2f0d9;
+    touch-action: manipulation;
   }
 }
 

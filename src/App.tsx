@@ -28,7 +28,7 @@ export default function App() {
     vy: 0,
     width: 32,
     height: 32,
-    speed: 4.0,
+    speed: 3.2,
     hp: 100,
     maxHp: 100,
     facing: 'right',
@@ -77,6 +77,7 @@ export default function App() {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isInventoryOpen, setIsInventoryOpen] = useState<boolean>(false);
   const [virtualDir, setVirtualDir] = useState<Direction | null>(null);
+  const [isMobileSprinting, setIsMobileSprinting] = useState<boolean>(false);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted((prev) => {
@@ -272,7 +273,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden select-none bg-black">
+    <div className={`relative w-full min-h-[100dvh] h-[100dvh] select-none bg-black ${gameScreen === 'SPLASH' ? 'overflow-y-auto' : 'overflow-hidden'}`}>
       {/* 1. Splash Screen / Main Menu */}
       {gameScreen === 'SPLASH' && (
         <SplashScreen
@@ -291,6 +292,7 @@ export default function App() {
             inventory={inventory}
             isPaused={isPaused}
             virtualDir={virtualDir}
+            isMobileSprinting={isMobileSprinting}
             onUpdatePlayer={setPlayer}
             onUpdateInventory={setInventory}
             onLevelComplete={handleLevelComplete}
@@ -314,6 +316,7 @@ export default function App() {
             inventory={inventory}
             isMuted={isMuted}
             isPaused={isPaused}
+            isSprinting={isMobileSprinting}
             onToggleMute={handleToggleMute}
             onTogglePause={() => setIsPaused((prev) => !prev)}
             onOpenInventory={() => setIsInventoryOpen(true)}
@@ -322,6 +325,7 @@ export default function App() {
               // Trigger Space attack via synthetic event
               window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
             }}
+            onToggleSprint={setIsMobileSprinting}
             onDirectionInput={setVirtualDir}
           />
         </>

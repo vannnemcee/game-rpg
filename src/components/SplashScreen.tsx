@@ -224,32 +224,32 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
   };
 
   return (
-    <div className="relative w-full h-screen flex flex-col items-center justify-between overflow-hidden select-none bg-emerald-950">
+    <div className="relative w-full min-h-[100dvh] h-full flex flex-col items-center justify-between overflow-y-auto overflow-x-hidden select-none bg-emerald-950 p-2 sm:p-4">
       {/* Background Pixel Canvas */}
       <canvas
         ref={canvasRef}
         width={800}
         height={600}
-        className="absolute inset-0 w-full h-full object-cover pixelated"
+        className="absolute inset-0 w-full h-full object-cover pixelated pointer-events-none"
       />
 
       {/* Top Header Buttons */}
-      <header className="relative z-10 w-full max-w-5xl px-6 pt-6 flex justify-between items-center">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-black/60 border-2 border-emerald-800 rounded-sm text-xs text-emerald-300 font-pixel">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+      <header className="relative z-10 w-full max-w-5xl px-3 sm:px-6 pt-1 sm:pt-4 flex justify-between items-center flex-shrink-0">
+        <div className="flex items-center gap-2 px-2.5 py-1 bg-black/60 border-2 border-emerald-800 rounded-sm text-[10px] sm:text-xs text-emerald-300 font-pixel">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
           FOXWOOD TALE v1.2 • 6 LEVELS
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             id="sound-toggle-btn"
             onClick={() => {
               onToggleMute();
             }}
-            className="p-2.5 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-700 text-emerald-300 rounded-sm cursor-pointer transition shadow-md"
+            className="p-2 sm:p-2.5 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-700 text-emerald-300 rounded-sm cursor-pointer transition shadow-md"
             title={isMuted ? 'Nyalakan Suara (M)' : 'Matikan Suara (M)'}
           >
-            {isMuted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-emerald-400" />}
+            {isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />}
           </button>
 
           <button
@@ -258,62 +258,62 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               sound.playUiClick();
               setShowHowToPlay(true);
             }}
-            className="flex items-center gap-2 px-3.5 py-2 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-700 text-emerald-200 text-xs font-pixel rounded-sm cursor-pointer transition shadow-md"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-700 text-emerald-200 text-[10px] sm:text-xs font-pixel rounded-sm cursor-pointer transition shadow-md"
           >
-            <HelpCircle className="w-4 h-4 text-emerald-400" />
+            <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
             KONTROL
           </button>
         </div>
       </header>
 
-      {/* Center Hero Title & Start Button */}
-      <main className="relative z-10 flex flex-col items-center text-center px-4 my-auto">
+      {/* Center Hero Title & Start Button - Compact on short screens / mobile landscape */}
+      <main className="relative z-10 flex flex-col items-center text-center px-2 sm:px-4 my-auto py-1 sm:py-4 max-w-2xl flex-shrink-0">
         {/* Title Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-3 bg-amber-950/80 border-2 border-amber-600/70 text-amber-300 text-xs font-pixel tracking-wider shadow-lg">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-1 sm:mb-2 bg-amber-950/80 border-2 border-amber-600/70 text-amber-300 text-[10px] sm:text-xs font-pixel tracking-wider shadow-lg">
+          <Sparkles className="w-3 h-3 text-amber-400 animate-spin" />
           PETUALANGAN RUBAH DI HUTAN MONSTER
         </div>
 
         {/* Main Pixel Title */}
-        <h1 className="text-4xl md:text-6xl font-bold font-pixel tracking-tight text-white drop-shadow-[0_6px_0_#14351b] mb-3">
+        <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold font-pixel tracking-tight text-white drop-shadow-[0_4px_0_#14351b] mb-1 sm:mb-2">
           FOXWOOD TALE
         </h1>
 
-        <p className="max-w-md text-emerald-200 text-sm md:text-base font-silkscreen mb-8 px-4 py-1.5 bg-black/40 border border-emerald-900/60 rounded">
+        <p className="max-w-lg text-emerald-200 text-[11px] sm:text-xs md:text-sm font-silkscreen mb-1.5 sm:mb-3 px-3 py-1 bg-black/40 border border-emerald-900/60 rounded">
           Bimbing <span className="text-orange-400 font-bold">Kiko si Rubah Pemberani</span> melewati hutan berbahaya, basmi monster, dan temukan jalan keluar!
         </p>
 
         {/* Character Card Preview */}
-        <div className="flex items-center gap-3 px-4 py-2 mb-8 bg-black/60 border-2 border-emerald-800 rounded-sm">
-          <div className="w-10 h-10 flex items-center justify-center bg-orange-950 border-2 border-orange-600 rounded">
-            <span className="text-2xl">🦊</span>
+        <div className="flex items-center gap-2.5 px-3 py-1 mb-2 sm:mb-4 bg-black/60 border-2 border-emerald-800 rounded-sm">
+          <div className="w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center bg-orange-950 border-2 border-orange-600 rounded">
+            <span className="text-base sm:text-xl">🦊</span>
           </div>
           <div className="text-left">
-            <div className="text-xs font-pixel text-orange-400">Kiko The Brave Fox</div>
-            <div className="text-[11px] text-emerald-300 font-silkscreen">HP: 100 • Pedang Kayu Magis</div>
+            <div className="text-[10px] sm:text-xs font-pixel text-orange-400">Kiko The Brave Fox</div>
+            <div className="text-[9px] sm:text-[11px] text-emerald-300 font-silkscreen">HP: 100 • Pedang Kayu Magis</div>
           </div>
         </div>
 
-        {/* Start Game Button */}
+        {/* Start Game Button (Prominent & Always visible on phone landscape) */}
         <button
           id="start-game-btn"
           onClick={handleStart}
-          className="pixel-btn-amber px-10 py-5 text-lg md:text-xl font-pixel flex items-center gap-3 tracking-widest cursor-pointer group"
+          className="pixel-btn-amber px-6 py-2.5 sm:px-10 sm:py-3.5 text-xs sm:text-base md:text-lg font-pixel flex items-center gap-2 tracking-wider cursor-pointer group shadow-2xl active:scale-95"
         >
-          <Play className="w-6 h-6 fill-current group-hover:translate-x-1 transition-transform" />
+          <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current group-hover:translate-x-1 transition-transform" />
           START ADVENTURE
         </button>
       </main>
 
       {/* Footer Info */}
-      <footer className="relative z-10 w-full py-4 text-center text-emerald-400/80 text-[11px] font-pixel bg-black/50 border-t border-emerald-900/50">
-        Tekan <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">WASD</kbd> / <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">Panah</kbd> Bergerak • Tahan <kbd className="px-1.5 py-0.5 bg-amber-900 border border-amber-600 rounded text-amber-200">SHIFT</kbd> Lari Cepat • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">SPASI</kbd> Serang • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">E</kbd> Potion • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">I</kbd> Tas
+      <footer className="relative z-10 w-full py-1.5 sm:py-2.5 text-center text-emerald-300/85 text-[9px] sm:text-[11px] font-pixel bg-black/60 border-t border-emerald-900/60 flex-shrink-0 mt-1">
+        WASD/Panah: Jalan • <span className="text-amber-300 font-bold">Tahan SHIFT</span>: Lari • <span className="text-amber-200 font-bold">KLIK KANAN MOUSE / SPASI</span>: Serang • E: Potion • I: Tas
       </footer>
 
       {/* How To Play Modal */}
       {showHowToPlay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-          <div className="pixel-box max-w-lg w-full p-6 text-white relative">
+          <div className="pixel-box max-w-lg w-full p-6 text-white relative max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-pixel text-amber-400 mb-4 pb-2 border-b-2 border-emerald-800 flex items-center gap-2">
               <Shield className="w-5 h-5 text-amber-400" />
               PANDUAN BERMAIN v1.2
@@ -324,11 +324,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 <div className="font-pixel text-amber-300 mb-2">🎮 KONTROL PERMAINAN:</div>
                 <ul className="space-y-1.5">
                   <li>• <strong className="text-white">W, A, S, D</strong> atau <strong className="text-white">Tombol Panah</strong>: Menggerakkan Rubah</li>
-                  <li>• <strong className="text-amber-300">SHIFT</strong>: Lari Cepat / Sprint (+50% kecepatan gerak)</li>
-                  <li>• <strong className="text-white">SPASI / Klik Mouse</strong>: Menebas pedang menyerang monster</li>
+                  <li>• <strong className="text-amber-300">Tahan SHIFT</strong> (atau tombol Lari): Lari Cepat / Sprint</li>
+                  <li>• <strong className="text-amber-200">Klik Kanan Mouse / SPASI</strong>: Menebas pedang menyerang monster (Desktop)</li>
                   <li>• <strong className="text-white">E</strong>: Meminum Ramuan Health Potion (+50 HP)</li>
                   <li>• <strong className="text-white">I / B</strong>: Buka & Tutup Tas Inventory</li>
-                  <li>• Tersedia tombol sentuh Virtual di layar untuk perangkat HP / Layar Sentuh!</li>
+                  <li>• Tersedia D-Pad & Tombol Sentuh Virtual untuk HP / Layar Sentuh!</li>
                 </ul>
               </div>
 

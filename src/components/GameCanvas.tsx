@@ -9,6 +9,7 @@ interface GameCanvasProps {
   inventory: InventoryItem[];
   isPaused: boolean;
   virtualDir: Direction | null;
+  isMobileSprinting?: boolean;
   onUpdatePlayer: (updater: (prev: Player) => Player) => void;
   onUpdateInventory: (updater: (prev: InventoryItem[]) => InventoryItem[]) => void;
   onLevelComplete: () => void;
@@ -25,6 +26,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   inventory,
   isPaused,
   virtualDir,
+  isMobileSprinting = false,
   onUpdatePlayer,
   onUpdateInventory,
   onLevelComplete,
@@ -77,16 +79,11 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     sound.startBGM(levelConfig.levelNumber);
   }, [levelConfig]);
 
-  // Keyboard Event Listeners
+  // Keyboard and Mouse Event Listeners
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const code = e.code;
       keysRef.current[code] = true;
-
-      // Quick Potion [E]
-      if (code === 'KeyE') {
-        // Triggered via HUD callback or direct
-      }
 
       // Space to Attack
       if (code === 'Space') {
@@ -99,12 +96,30 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       keysRef.current[e.code] = false;
     };
 
+    // Right-Click Attack for Desktop (button === 2)
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button === 2) {
+        e.preventDefault();
+        triggerAttack();
+      }
+    };
+
+    // Prevent context menu from popping up when right-clicking to attack
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      triggerAttack();
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('contextmenu', handleContextMenu);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('contextmenu', handleContextMenu);
     };
   }, []);
 
@@ -288,14 +303,34 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         if (keys['KeyA'] || keys['ArrowLeft'] || virtualDir === 'left') moveX -= 1;
         if (keys['KeyD'] || keys['ArrowRight'] || virtualDir === 'right') moveX += 1;
 
+        // Move Player with solid obstacle collision checks (with sprint support)
+        const isSprinting = Boolean(keys['ShiftLeft'] || keys['ShiftRight'] || isMobileSprinting);
+        const currentSpeed = isSprinting ? p.speed * 1.6 : p.speed;
+
         // Determine facing & animation state
         if (!p.isAttacking) {
           if (moveX !== 0 || moveY !== 0) {
-            p.animState = 'walk';
+            p.animState = isSprinting ? 'run' : 'walk';
             if (moveX > 0) p.facing = 'right';
             else if (moveX < 0) p.facing = 'left';
             else if (moveY > 0) p.facing = 'down';
             else if (moveY < 0) p.facing = 'up';
+
+            // Spawn running dust puff particles behind Kiko
+            if (isSprinting && Math.random() < 0.28) {
+              particlesRef.current.push({
+                id: `dust-${Date.now()}-${Math.random()}`,
+                x: p.x + (Math.random() - 0.5) * 10,
+                y: p.y + 12,
+                vx: -moveX * 0.7 + (Math.random() - 0.5) * 0.3,
+                vy: -moveY * 0.7 - Math.random() * 0.3,
+                color: levelConfig.levelNumber === 4 ? '#fb923c' : '#86efac',
+                size: 2.5,
+                life: 0.22,
+                maxLife: 0.22,
+                type: 'smoke',
+              });
+            }
           } else {
             p.animState = 'idle';
           }
@@ -306,10 +341,6 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
           moveX *= 0.7071;
           moveY *= 0.7071;
         }
-
-        // Move Player with solid obstacle collision checks (with sprint support)
-        const isSprinting = Boolean(keys['ShiftLeft'] || keys['ShiftRight']);
-        const currentSpeed = isSprinting ? p.speed * 1.4 : p.speed;
 
         const nextX = p.x + moveX * currentSpeed;
         const nextY = p.y + moveY * currentSpeed;
@@ -752,9 +783,13 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden select-none bg-black">
+    <div className="relative w-full h-full min-h-[100dvh] overflow-hidden select-none bg-black">
       <canvas
         ref={canvasRef}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          triggerAttack();
+        }}
         className="w-full h-full block pixelated cursor-crosshair"
       />
     </div>
