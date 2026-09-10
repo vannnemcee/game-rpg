@@ -62,35 +62,37 @@ export function createLevel1(): LevelConfig {
 
   // River crossing the map around x = 950 to 1010
   const riverX = 960;
-  const riverW = 60;
+  const riverW = 68;
+  const bridgeY = 480;
+  const bridgeH = 150;
+
   // River segments above and below the bridge
-  // Bridge is at y = 520 to 620
   obstacles.push({
     id: 'river-top',
     type: 'river',
     x: riverX,
-    y: 60,
+    y: 0,
     width: riverW,
-    height: 460,
+    height: bridgeY,
     isSolid: true,
   });
   // Wooden bridge to cross safely
   obstacles.push({
     id: 'bridge-center',
     type: 'bridge',
-    x: riverX - 8,
-    y: 520,
-    width: riverW + 16,
-    height: 100,
+    x: riverX - 16,
+    y: bridgeY,
+    width: riverW + 32,
+    height: bridgeH,
     isSolid: false, // Walkable!
   });
   obstacles.push({
     id: 'river-bot',
     type: 'river',
     x: riverX,
-    y: 620,
+    y: bridgeY + bridgeH,
     width: riverW,
-    height: mapHeight - 700,
+    height: mapHeight - (bridgeY + bridgeH),
     isSolid: true,
   });
 
@@ -112,15 +114,15 @@ export function createLevel1(): LevelConfig {
     { type: 'tree_small', x: 530, y: 780, w: 48, h: 56, solid: true },
     { type: 'rock', x: 460, y: 640, w: 38, h: 32, solid: true },
 
-    // Near the bridge
-    { type: 'torch', x: 910, y: 500, w: 24, h: 36, solid: true },
-    { type: 'torch', x: 910, y: 630, w: 24, h: 36, solid: true },
-    { type: 'bush', x: 860, y: 420, w: 44, h: 32, solid: false },
-    { type: 'rock', x: 870, y: 680, w: 42, h: 36, solid: true },
+    // Near the bridge (framing the entrance on north and south sides)
+    { type: 'torch', x: 910, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 910, y: 650, w: 24, h: 36, solid: true },
+    { type: 'bush', x: 860, y: 390, w: 44, h: 32, solid: false },
+    { type: 'rock', x: 870, y: 710, w: 42, h: 36, solid: true },
 
     // East side of the river (exploration area)
-    { type: 'torch', x: 1050, y: 500, w: 24, h: 36, solid: true },
-    { type: 'torch', x: 1050, y: 630, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 1040, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 1040, y: 650, w: 24, h: 36, solid: true },
     { type: 'tree_large', x: 1180, y: 260, w: 64, h: 72, solid: true },
     { type: 'tree_small', x: 1250, y: 220, w: 48, h: 56, solid: true },
     { type: 'rock', x: 1150, y: 420, w: 42, h: 36, solid: true },
@@ -328,6 +330,7 @@ export function createLevel1(): LevelConfig {
     portalY: 500,
     ambientLight: 'rgba(255, 255, 255, 0.02)',
     hasFog: false,
+    theme: 'forest',
     enemies,
     collectibles,
     obstacles,
@@ -685,6 +688,1025 @@ export function createLevel2(): LevelConfig {
     portalY: 500,
     ambientLight: 'rgba(15, 8, 25, 0.45)', // Dark purple mystery vignette
     hasFog: true,
+    theme: 'dark',
+    enemies,
+    collectibles,
+    obstacles,
+  };
+}
+
+export function createLevel3(): LevelConfig {
+  const mapWidth = 2200;
+  const mapHeight = 1200;
+  const obstacles: Obstacle[] = [];
+
+  // Top & Bottom boundary
+  for (let x = 0; x < mapWidth; x += 70) {
+    obstacles.push({ id: `l3-bt-${x}`, type: 'tree_large', x, y: 0, width: 64, height: 72, isSolid: true });
+    obstacles.push({ id: `l3-bb-${x}`, type: 'tree_large', x, y: mapHeight - 80, width: 64, height: 72, isSolid: true });
+  }
+
+  // Left & Right boundary
+  for (let y = 80; y < mapHeight - 80; y += 70) {
+    obstacles.push({ id: `l3-bl-${y}`, type: 'tree_large', x: 0, y, width: 64, height: 72, isSolid: true });
+    if (y < 460 || y > 640) {
+      obstacles.push({ id: `l3-br-${y}`, type: 'tree_large', x: mapWidth - 70, y, width: 64, height: 72, isSolid: true });
+    }
+  }
+
+  // Swamp Murky River with wooden bridge crossing at x = 1050
+  const riverX = 1050;
+  const riverW = 70;
+  const bridgeY = 480;
+  const bridgeH = 150;
+
+  obstacles.push({
+    id: 'l3-river-top',
+    type: 'river',
+    x: riverX,
+    y: 0,
+    width: riverW,
+    height: bridgeY,
+    isSolid: true,
+    variant: 1, // Swamp green water
+  });
+  obstacles.push({
+    id: 'l3-bridge',
+    type: 'bridge',
+    x: riverX - 16,
+    y: bridgeY,
+    width: riverW + 32,
+    height: bridgeH,
+    isSolid: false,
+  });
+  obstacles.push({
+    id: 'l3-river-bot',
+    type: 'river',
+    x: riverX,
+    y: bridgeY + bridgeH,
+    width: riverW,
+    height: mapHeight - (bridgeY + bridgeH),
+    isSolid: true,
+    variant: 1,
+  });
+
+  // Swamp Thorns & Ruins
+  const l3Decors: { type: Obstacle['type']; x: number; y: number; w: number; h: number; solid: boolean }[] = [
+    { type: 'thorn_bush', x: 260, y: 380, w: 46, h: 36, solid: true },
+    { type: 'torch', x: 200, y: 440, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 200, y: 660, w: 24, h: 36, solid: true },
+    { type: 'rock', x: 380, y: 680, w: 48, h: 40, solid: true },
+    { type: 'ruins_pillar', x: 550, y: 340, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 550, y: 720, w: 38, h: 54, solid: true },
+    { type: 'thorn_bush', x: 700, y: 440, w: 46, h: 36, solid: true },
+    { type: 'torch', x: 800, y: 360, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 800, y: 720, w: 24, h: 36, solid: true },
+    // Framing bridge
+    { type: 'torch', x: riverX - 50, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX - 50, y: 650, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX + 90, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX + 90, y: 650, w: 24, h: 36, solid: true },
+    // East side
+    { type: 'ruins_pillar', x: 1350, y: 380, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 1350, y: 680, w: 38, h: 54, solid: true },
+    { type: 'thorn_bush', x: 1520, y: 520, w: 46, h: 36, solid: true },
+    { type: 'torch', x: 1700, y: 380, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 1700, y: 700, w: 24, h: 36, solid: true },
+    { type: 'rock', x: 1850, y: 420, w: 48, h: 40, solid: true },
+  ];
+
+  l3Decors.forEach((d, idx) => {
+    obstacles.push({
+      id: `l3-decor-${idx}`,
+      type: d.type,
+      x: d.x,
+      y: d.y,
+      width: d.w,
+      height: d.h,
+      isSolid: d.solid,
+    });
+  });
+
+  // Portal
+  obstacles.push({
+    id: 'exit-portal-l3',
+    type: 'portal',
+    x: 2000,
+    y: 500,
+    width: 76,
+    height: 96,
+    isSolid: false,
+  });
+
+  const collectibles: Collectible[] = [
+    { id: 'l3-c1', type: 'coin', x: 260, y: 520, width: 16, height: 16, collected: false, bobOffset: 0.1, value: 20 },
+    { id: 'l3-c2', type: 'berry', x: 420, y: 500, width: 18, height: 18, collected: false, bobOffset: 0.4, value: 20 },
+    { id: 'l3-c3', type: 'crystal', x: 620, y: 400, width: 16, height: 20, collected: false, bobOffset: 0.7, value: 1 },
+    { id: 'l3-c4', type: 'potion', x: 820, y: 540, width: 20, height: 20, collected: false, bobOffset: 0.2, value: 50 },
+    // On the bridge
+    { id: 'l3-c5', type: 'coin', x: 1085, y: 550, width: 16, height: 16, collected: false, bobOffset: 0.5, value: 25 },
+    { id: 'l3-c6', type: 'crystal', x: 1400, y: 520, width: 16, height: 20, collected: false, bobOffset: 0.9, value: 1 },
+    { id: 'l3-c7', type: 'potion', x: 1650, y: 460, width: 20, height: 20, collected: false, bobOffset: 0.3, value: 50 },
+    { id: 'l3-c8', type: 'coin', x: 1880, y: 560, width: 16, height: 16, collected: false, bobOffset: 0.8, value: 30 },
+  ];
+
+  const enemies: Enemy[] = [
+    {
+      id: 'l3-e1',
+      type: 'slime',
+      name: 'Toxic Slime',
+      x: 320,
+      y: 520,
+      vx: 0,
+      vy: 0,
+      width: 28,
+      height: 24,
+      hp: 30,
+      maxHp: 30,
+      speed: 1.4,
+      damage: 14,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 260,
+      patrolStartX: 320,
+      patrolStartY: 520,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'berry',
+    },
+    {
+      id: 'l3-e2',
+      type: 'mushroom_monster',
+      name: 'Spore Fiend',
+      x: 650,
+      y: 530,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 40,
+      maxHp: 40,
+      speed: 1.3,
+      damage: 16,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 270,
+      patrolStartX: 650,
+      patrolStartY: 530,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'potion',
+    },
+    {
+      id: 'l3-e3',
+      type: 'shadow_monster',
+      name: 'Bog Lurker',
+      x: 920,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 38,
+      maxHp: 38,
+      speed: 2.1,
+      damage: 18,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 300,
+      patrolStartX: 920,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+    {
+      id: 'l3-e4',
+      type: 'forest_monster',
+      name: 'Swamp Goblin',
+      x: 1300,
+      y: 550,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 36,
+      maxHp: 36,
+      speed: 1.6,
+      damage: 15,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 260,
+      patrolStartX: 1300,
+      patrolStartY: 550,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'coin',
+    },
+    {
+      id: 'l3-e5',
+      type: 'shadow_monster',
+      name: 'Mire Phantom',
+      x: 1720,
+      y: 530,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 44,
+      maxHp: 44,
+      speed: 2.2,
+      damage: 20,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 310,
+      patrolStartX: 1720,
+      patrolStartY: 530,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+  ];
+
+  return {
+    levelNumber: 3,
+    title: 'LEVEL 3: LEMBAH KABUT BERACUN',
+    subtitle: 'Rawa Misterius Berisi Spora Beracun',
+    description: 'Menyeberangi jembatan rawa berkabut hijau! Waspadai jamur spora dan monster bayangan yang berpatroli cepat.',
+    mapWidth,
+    mapHeight,
+    playerStartX: 100,
+    playerStartY: 550,
+    portalX: 2000,
+    portalY: 500,
+    ambientLight: 'rgba(10, 25, 18, 0.42)',
+    hasFog: true,
+    theme: 'swamp',
+    enemies,
+    collectibles,
+    obstacles,
+  };
+}
+
+export function createLevel4(): LevelConfig {
+  const mapWidth = 2300;
+  const mapHeight = 1200;
+  const obstacles: Obstacle[] = [];
+
+  // Top & Bottom boundary (scorched trees)
+  for (let x = 0; x < mapWidth; x += 70) {
+    obstacles.push({ id: `l4-bt-${x}`, type: 'tree_large', x, y: 0, width: 64, height: 72, isSolid: true });
+    obstacles.push({ id: `l4-bb-${x}`, type: 'tree_large', x, y: mapHeight - 80, width: 64, height: 72, isSolid: true });
+  }
+
+  // Left & Right boundary
+  for (let y = 80; y < mapHeight - 80; y += 70) {
+    obstacles.push({ id: `l4-bl-${y}`, type: 'tree_large', x: 0, y, width: 64, height: 72, isSolid: true });
+    if (y < 460 || y > 640) {
+      obstacles.push({ id: `l4-br-${y}`, type: 'tree_large', x: mapWidth - 70, y, width: 64, height: 72, isSolid: true });
+    }
+  }
+
+  // Molten Magma Chasm crossing at x = 1100
+  const riverX = 1100;
+  const riverW = 76;
+  const bridgeY = 480;
+  const bridgeH = 150;
+
+  obstacles.push({
+    id: 'l4-lava-top',
+    type: 'river',
+    x: riverX,
+    y: 0,
+    width: riverW,
+    height: bridgeY,
+    isSolid: true,
+    variant: 2, // Molten Lava!
+  });
+  obstacles.push({
+    id: 'l4-bridge',
+    type: 'bridge',
+    x: riverX - 16,
+    y: bridgeY,
+    width: riverW + 32,
+    height: bridgeH,
+    isSolid: false,
+  });
+  obstacles.push({
+    id: 'l4-lava-bot',
+    type: 'river',
+    x: riverX,
+    y: bridgeY + bridgeH,
+    width: riverW,
+    height: mapHeight - (bridgeY + bridgeH),
+    isSolid: true,
+    variant: 2,
+  });
+
+  // Volcanic Decors & Pillars
+  const l4Decors: { type: Obstacle['type']; x: number; y: number; w: number; h: number; solid: boolean }[] = [
+    { type: 'torch', x: 180, y: 440, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 180, y: 660, w: 24, h: 36, solid: true },
+    { type: 'rock', x: 340, y: 400, w: 48, h: 40, solid: true },
+    { type: 'rock', x: 340, y: 680, w: 48, h: 40, solid: true },
+    { type: 'ruins_pillar', x: 560, y: 360, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 560, y: 720, w: 38, h: 54, solid: true },
+    { type: 'thorn_bush', x: 740, y: 500, w: 46, h: 36, solid: true },
+    { type: 'torch', x: 860, y: 380, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 860, y: 700, w: 24, h: 36, solid: true },
+    // Magma bridge torches
+    { type: 'torch', x: riverX - 50, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX - 50, y: 650, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX + 96, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX + 96, y: 650, w: 24, h: 36, solid: true },
+    // Beyond the chasm
+    { type: 'ruins_pillar', x: 1400, y: 360, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 1400, y: 720, w: 38, h: 54, solid: true },
+    { type: 'thorn_bush', x: 1600, y: 450, w: 46, h: 36, solid: true },
+    { type: 'rock', x: 1750, y: 650, w: 48, h: 40, solid: true },
+    { type: 'torch', x: 1900, y: 420, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 1900, y: 680, w: 24, h: 36, solid: true },
+  ];
+
+  l4Decors.forEach((d, idx) => {
+    obstacles.push({
+      id: `l4-decor-${idx}`,
+      type: d.type,
+      x: d.x,
+      y: d.y,
+      width: d.w,
+      height: d.h,
+      isSolid: d.solid,
+    });
+  });
+
+  // Portal
+  obstacles.push({
+    id: 'exit-portal-l4',
+    type: 'portal',
+    x: 2100,
+    y: 500,
+    width: 76,
+    height: 96,
+    isSolid: false,
+  });
+
+  const collectibles: Collectible[] = [
+    { id: 'l4-c1', type: 'coin', x: 260, y: 540, width: 16, height: 16, collected: false, bobOffset: 0.1, value: 25 },
+    { id: 'l4-c2', type: 'crystal', x: 500, y: 440, width: 16, height: 20, collected: false, bobOffset: 0.5, value: 1 },
+    { id: 'l4-c3', type: 'potion', x: 740, y: 600, width: 20, height: 20, collected: false, bobOffset: 0.2, value: 50 },
+    // On the magma bridge
+    { id: 'l4-c4', type: 'coin', x: 1138, y: 555, width: 16, height: 16, collected: false, bobOffset: 0.6, value: 30 },
+    { id: 'l4-c5', type: 'crystal', x: 1450, y: 530, width: 16, height: 20, collected: false, bobOffset: 0.8, value: 1 },
+    { id: 'l4-c6', type: 'potion', x: 1700, y: 480, width: 20, height: 20, collected: false, bobOffset: 0.3, value: 50 },
+    { id: 'l4-c7', type: 'coin', x: 1950, y: 550, width: 16, height: 16, collected: false, bobOffset: 0.4, value: 35 },
+  ];
+
+  const enemies: Enemy[] = [
+    {
+      id: 'l4-e1',
+      type: 'slime',
+      name: 'Magma Slime',
+      x: 350,
+      y: 530,
+      vx: 0,
+      vy: 0,
+      width: 28,
+      height: 24,
+      hp: 35,
+      maxHp: 35,
+      speed: 1.5,
+      damage: 16,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 280,
+      patrolStartX: 350,
+      patrolStartY: 530,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'coin',
+    },
+    {
+      id: 'l4-e2',
+      type: 'shadow_monster',
+      name: 'Obsidian Stalker',
+      x: 680,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 46,
+      maxHp: 46,
+      speed: 2.3,
+      damage: 22,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 320,
+      patrolStartX: 680,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+    {
+      id: 'l4-e3',
+      type: 'mushroom_monster',
+      name: 'Flame Spore',
+      x: 960,
+      y: 520,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 45,
+      maxHp: 45,
+      speed: 1.4,
+      damage: 18,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 280,
+      patrolStartX: 960,
+      patrolStartY: 520,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'potion',
+    },
+    {
+      id: 'l4-e4',
+      type: 'shadow_monster',
+      name: 'Lava Fiend',
+      x: 1450,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 50,
+      maxHp: 50,
+      speed: 2.4,
+      damage: 24,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 320,
+      patrolStartX: 1450,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+    {
+      id: 'l4-e5',
+      type: 'forest_monster',
+      name: 'Firebrand Goblin',
+      x: 1800,
+      y: 530,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 42,
+      maxHp: 42,
+      speed: 1.7,
+      damage: 18,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 280,
+      patrolStartX: 1800,
+      patrolStartY: 530,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'coin',
+    },
+  ];
+
+  return {
+    levelNumber: 4,
+    title: 'LEVEL 4: RERUNTUHAN OBSIDIAN & MAGMA',
+    subtitle: 'Ngarai Lahar Membara & Bebatuan Hangus',
+    description: 'Hawa panas menyengat! Seberangi jembatan di atas sungai lahar cair dan hadapi Shadow Monster yang ganas.',
+    mapWidth,
+    mapHeight,
+    playerStartX: 100,
+    playerStartY: 550,
+    portalX: 2100,
+    portalY: 500,
+    ambientLight: 'rgba(35, 10, 8, 0.4)',
+    hasFog: true,
+    theme: 'volcano',
+    enemies,
+    collectibles,
+    obstacles,
+  };
+}
+
+export function createLevel5(): LevelConfig {
+  const mapWidth = 2400;
+  const mapHeight = 1200;
+  const obstacles: Obstacle[] = [];
+
+  // Top & Bottom boundary
+  for (let x = 0; x < mapWidth; x += 70) {
+    obstacles.push({ id: `l5-bt-${x}`, type: 'tree_large', x, y: 0, width: 64, height: 72, isSolid: true });
+    obstacles.push({ id: `l5-bb-${x}`, type: 'tree_large', x, y: mapHeight - 80, width: 64, height: 72, isSolid: true });
+  }
+
+  // Left & Right boundary
+  for (let y = 80; y < mapHeight - 80; y += 70) {
+    obstacles.push({ id: `l5-bl-${y}`, type: 'tree_large', x: 0, y, width: 64, height: 72, isSolid: true });
+    if (y < 460 || y > 640) {
+      obstacles.push({ id: `l5-br-${y}`, type: 'tree_large', x: mapWidth - 70, y, width: 64, height: 72, isSolid: true });
+    }
+  }
+
+  // Ancient Citadel Corridors (Dense Ruins Pillars & Torches)
+  const l5Decors: { type: Obstacle['type']; x: number; y: number; w: number; h: number; solid: boolean }[] = [
+    { type: 'torch', x: 180, y: 440, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 180, y: 660, w: 24, h: 36, solid: true },
+    { type: 'ruins_pillar', x: 320, y: 360, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 320, y: 720, w: 38, h: 54, solid: true },
+    { type: 'thorn_bush', x: 480, y: 480, w: 46, h: 36, solid: true },
+    // Citadel Gate 1
+    { type: 'ruins_pillar', x: 680, y: 340, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 680, y: 740, w: 38, h: 54, solid: true },
+    { type: 'torch', x: 720, y: 440, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 720, y: 640, w: 24, h: 36, solid: true },
+    // Hallway of Shadows
+    { type: 'ruins_pillar', x: 1020, y: 380, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 1020, y: 700, w: 38, h: 54, solid: true },
+    { type: 'thorn_bush', x: 1180, y: 520, w: 46, h: 36, solid: true },
+    { type: 'torch', x: 1320, y: 360, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 1320, y: 720, w: 24, h: 36, solid: true },
+    // Inner Sanctum
+    { type: 'ruins_pillar', x: 1560, y: 340, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 1560, y: 740, w: 38, h: 54, solid: true },
+    { type: 'torch', x: 1720, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 1720, y: 650, w: 24, h: 36, solid: true },
+    { type: 'rock', x: 1880, y: 400, w: 48, h: 40, solid: true },
+    { type: 'rock', x: 1880, y: 680, w: 48, h: 40, solid: true },
+    { type: 'torch', x: 2020, y: 440, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 2020, y: 640, w: 24, h: 36, solid: true },
+  ];
+
+  l5Decors.forEach((d, idx) => {
+    obstacles.push({
+      id: `l5-decor-${idx}`,
+      type: d.type,
+      x: d.x,
+      y: d.y,
+      width: d.w,
+      height: d.h,
+      isSolid: d.solid,
+    });
+  });
+
+  // Portal to Final Core
+  obstacles.push({
+    id: 'exit-portal-l5',
+    type: 'portal',
+    x: 2200,
+    y: 500,
+    width: 76,
+    height: 96,
+    isSolid: false,
+  });
+
+  const collectibles: Collectible[] = [
+    { id: 'l5-c1', type: 'coin', x: 260, y: 550, width: 16, height: 16, collected: false, bobOffset: 0.1, value: 30 },
+    { id: 'l5-c2', type: 'potion', x: 500, y: 520, width: 20, height: 20, collected: false, bobOffset: 0.3, value: 50 },
+    { id: 'l5-c3', type: 'crystal', x: 780, y: 540, width: 16, height: 20, collected: false, bobOffset: 0.7, value: 1 },
+    { id: 'l5-c4', type: 'coin', x: 1100, y: 530, width: 16, height: 16, collected: false, bobOffset: 0.5, value: 35 },
+    { id: 'l5-c5', type: 'potion', x: 1400, y: 550, width: 20, height: 20, collected: false, bobOffset: 0.2, value: 50 },
+    { id: 'l5-c6', type: 'crystal', x: 1650, y: 500, width: 16, height: 20, collected: false, bobOffset: 0.8, value: 1 },
+    { id: 'l5-c7', type: 'coin', x: 1950, y: 550, width: 16, height: 16, collected: false, bobOffset: 0.4, value: 40 },
+  ];
+
+  const enemies: Enemy[] = [
+    {
+      id: 'l5-e1',
+      type: 'shadow_monster',
+      name: 'Citadel Shadow',
+      x: 400,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 50,
+      maxHp: 50,
+      speed: 2.4,
+      damage: 24,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 320,
+      patrolStartX: 400,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+    {
+      id: 'l5-e2',
+      type: 'mushroom_monster',
+      name: 'Citadel Spore Fiend',
+      x: 850,
+      y: 530,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 52,
+      maxHp: 52,
+      speed: 1.5,
+      damage: 20,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 290,
+      patrolStartX: 850,
+      patrolStartY: 530,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'potion',
+    },
+    {
+      id: 'l5-e3',
+      type: 'shadow_monster',
+      name: 'Dread Sentinel',
+      x: 1250,
+      y: 550,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 55,
+      maxHp: 55,
+      speed: 2.5,
+      damage: 26,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 340,
+      patrolStartX: 1250,
+      patrolStartY: 550,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+    {
+      id: 'l5-e4',
+      type: 'forest_monster',
+      name: 'Citadel Goblin Champion',
+      x: 1600,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 48,
+      maxHp: 48,
+      speed: 1.8,
+      damage: 22,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 300,
+      patrolStartX: 1600,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'coin',
+    },
+    {
+      id: 'l5-e5',
+      type: 'shadow_monster',
+      name: 'Abyssal Knight',
+      x: 1850,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 60,
+      maxHp: 60,
+      speed: 2.6,
+      damage: 28,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 350,
+      patrolStartX: 1850,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'potion',
+    },
+  ];
+
+  return {
+    levelNumber: 5,
+    title: 'LEVEL 5: BENTENG BAYANGAN KUNO',
+    subtitle: 'Reruntuhan Benteng Kegelapan Para Monster',
+    description: 'Benteng kuno yang dihuni oleh para penjaga bayangan elit! Terobos barisan pilar kuno dan kumpulkan perbekalan terakhir.',
+    mapWidth,
+    mapHeight,
+    playerStartX: 100,
+    playerStartY: 550,
+    portalX: 2200,
+    portalY: 500,
+    ambientLight: 'rgba(12, 10, 24, 0.48)',
+    hasFog: true,
+    theme: 'citadel',
+    enemies,
+    collectibles,
+    obstacles,
+  };
+}
+
+export function createLevel6(): LevelConfig {
+  const mapWidth = 2500;
+  const mapHeight = 1200;
+  const obstacles: Obstacle[] = [];
+
+  // Top & Bottom boundary
+  for (let x = 0; x < mapWidth; x += 70) {
+    obstacles.push({ id: `l6-bt-${x}`, type: 'tree_large', x, y: 0, width: 64, height: 72, isSolid: true });
+    obstacles.push({ id: `l6-bb-${x}`, type: 'tree_large', x, y: mapHeight - 80, width: 64, height: 72, isSolid: true });
+  }
+
+  // Left & Right boundary
+  for (let y = 80; y < mapHeight - 80; y += 70) {
+    obstacles.push({ id: `l6-bl-${y}`, type: 'tree_large', x: 0, y, width: 64, height: 72, isSolid: true });
+    if (y < 460 || y > 640) {
+      obstacles.push({ id: `l6-br-${y}`, type: 'tree_large', x: mapWidth - 70, y, width: 64, height: 72, isSolid: true });
+    }
+  }
+
+  // Chasm & Grand Sanctuary Bridge at x = 1150
+  const riverX = 1150;
+  const riverW = 80;
+  const bridgeY = 480;
+  const bridgeH = 150;
+
+  obstacles.push({
+    id: 'l6-void-top',
+    type: 'river',
+    x: riverX,
+    y: 0,
+    width: riverW,
+    height: bridgeY,
+    isSolid: true,
+    variant: 2, // Molten Void Lava
+  });
+  obstacles.push({
+    id: 'l6-bridge',
+    type: 'bridge',
+    x: riverX - 16,
+    y: bridgeY,
+    width: riverW + 32,
+    height: bridgeH,
+    isSolid: false,
+  });
+  obstacles.push({
+    id: 'l6-void-bot',
+    type: 'river',
+    x: riverX,
+    y: bridgeY + bridgeH,
+    width: riverW,
+    height: mapHeight - (bridgeY + bridgeH),
+    isSolid: true,
+    variant: 2,
+  });
+
+  // Grand Cosmic Pillars & Torches
+  const l6Decors: { type: Obstacle['type']; x: number; y: number; w: number; h: number; solid: boolean }[] = [
+    { type: 'torch', x: 180, y: 440, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 180, y: 660, w: 24, h: 36, solid: true },
+    { type: 'ruins_pillar', x: 380, y: 360, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 380, y: 720, w: 38, h: 54, solid: true },
+    { type: 'thorn_bush', x: 560, y: 490, w: 46, h: 36, solid: true },
+    { type: 'torch', x: 740, y: 380, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 740, y: 700, w: 24, h: 36, solid: true },
+    { type: 'ruins_pillar', x: 920, y: 360, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 920, y: 720, w: 38, h: 54, solid: true },
+    // Bridge Torches
+    { type: 'torch', x: riverX - 50, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX - 50, y: 650, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX + 100, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: riverX + 100, y: 650, w: 24, h: 36, solid: true },
+    // Final Grand Sanctuary Courtyard
+    { type: 'ruins_pillar', x: 1450, y: 340, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 1450, y: 740, w: 38, h: 54, solid: true },
+    { type: 'torch', x: 1650, y: 400, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 1650, y: 680, w: 24, h: 36, solid: true },
+    { type: 'ruins_pillar', x: 1850, y: 340, w: 38, h: 54, solid: true },
+    { type: 'ruins_pillar', x: 1850, y: 740, w: 38, h: 54, solid: true },
+    { type: 'torch', x: 2050, y: 430, w: 24, h: 36, solid: true },
+    { type: 'torch', x: 2050, y: 650, w: 24, h: 36, solid: true },
+  ];
+
+  l6Decors.forEach((d, idx) => {
+    obstacles.push({
+      id: `l6-decor-${idx}`,
+      type: d.type,
+      x: d.x,
+      y: d.y,
+      width: d.w,
+      height: d.h,
+      isSolid: d.solid,
+    });
+  });
+
+  // GRAND SACRED VICTORY PORTAL
+  obstacles.push({
+    id: 'exit-portal-l6',
+    type: 'portal',
+    x: 2300,
+    y: 500,
+    width: 76,
+    height: 96,
+    isSolid: false,
+  });
+
+  const collectibles: Collectible[] = [
+    { id: 'l6-c1', type: 'coin', x: 280, y: 550, width: 16, height: 16, collected: false, bobOffset: 0.1, value: 50 },
+    { id: 'l6-c2', type: 'potion', x: 500, y: 550, width: 20, height: 20, collected: false, bobOffset: 0.3, value: 50 },
+    { id: 'l6-c3', type: 'crystal', x: 750, y: 540, width: 16, height: 20, collected: false, bobOffset: 0.6, value: 1 },
+    // On the Bridge
+    { id: 'l6-c4', type: 'coin', x: 1190, y: 555, width: 16, height: 16, collected: false, bobOffset: 0.2, value: 50 },
+    { id: 'l6-c5', type: 'potion', x: 1550, y: 540, width: 20, height: 20, collected: false, bobOffset: 0.5, value: 50 },
+    { id: 'l6-c6', type: 'crystal', x: 1800, y: 530, width: 16, height: 20, collected: false, bobOffset: 0.8, value: 1 },
+    { id: 'l6-c7', type: 'coin', x: 2150, y: 550, width: 16, height: 16, collected: false, bobOffset: 0.4, value: 100 },
+  ];
+
+  const enemies: Enemy[] = [
+    {
+      id: 'l6-e1',
+      type: 'shadow_monster',
+      name: 'Void Shadow',
+      x: 420,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 55,
+      maxHp: 55,
+      speed: 2.5,
+      damage: 26,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 330,
+      patrolStartX: 420,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+    {
+      id: 'l6-e2',
+      type: 'mushroom_monster',
+      name: 'Void Spore Sovereign',
+      x: 820,
+      y: 530,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 58,
+      maxHp: 58,
+      speed: 1.6,
+      damage: 24,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 300,
+      patrolStartX: 820,
+      patrolStartY: 530,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'potion',
+    },
+    {
+      id: 'l6-e3',
+      type: 'shadow_monster',
+      name: 'Void Behemoth',
+      x: 1350,
+      y: 550,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 65,
+      maxHp: 65,
+      speed: 2.7,
+      damage: 30,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 360,
+      patrolStartX: 1350,
+      patrolStartY: 550,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'crystal',
+    },
+    {
+      id: 'l6-e4',
+      type: 'forest_monster',
+      name: 'Elder Void Fiend',
+      x: 1720,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 55,
+      maxHp: 55,
+      speed: 2.0,
+      damage: 25,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 320,
+      patrolStartX: 1720,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'coin',
+    },
+    {
+      id: 'l6-e5',
+      type: 'shadow_monster',
+      name: 'Lord of the Void Core',
+      x: 2050,
+      y: 540,
+      vx: 0,
+      vy: 0,
+      width: 32,
+      height: 32,
+      hp: 75,
+      maxHp: 75,
+      speed: 2.8,
+      damage: 32,
+      facing: 'left',
+      animTimer: 0,
+      hurtTimer: 0,
+      attackCooldown: 0,
+      aggroRadius: 380,
+      patrolStartX: 2050,
+      patrolStartY: 540,
+      isDead: false,
+      deathTimer: 0,
+      dropType: 'potion',
+    },
+  ];
+
+  return {
+    levelNumber: 6,
+    title: 'LEVEL 6: PUNCAK INTI FOXWOOD',
+    subtitle: 'Pertarungan Terakhir di Gerbang Suci Kosmik',
+    description: 'Puncak petualangan Foxwood! Tembus penjagaan Lord of the Void Core dan capai Gerbang Suci Terakhir untuk menyelamatkan hutan!',
+    mapWidth,
+    mapHeight,
+    playerStartX: 100,
+    playerStartY: 550,
+    portalX: 2300,
+    portalY: 500,
+    ambientLight: 'rgba(16, 8, 30, 0.45)',
+    hasFog: true,
+    theme: 'sanctuary',
     enemies,
     collectibles,
     obstacles,

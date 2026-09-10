@@ -7,7 +7,7 @@ class SoundSystem {
   private masterGain: GainNode | null = null;
   private isMuted: boolean = false;
   private activeNodes: Set<AudioNode> = new Set();
-  private currentBgm: 'menu' | 1 | 2 | null = null;
+  private currentBgm: 'menu' | 1 | 2 | 3 | 4 | 5 | 6 | null = null;
   private isBgmPlaying: boolean = false;
   private bgmInterval: number | null = null;
 
@@ -483,7 +483,7 @@ class SoundSystem {
 
   // --- Dynamic Procedural RPG Background Music ---
 
-  public startBGM(track: 'menu' | 1 | 2) {
+  public startBGM(track: 'menu' | 1 | 2 | 3 | 4 | 5 | 6) {
     this.currentBgm = track;
     if (this.isMuted) return;
     if (this.isBgmPlaying && this.currentBgm === track && this.bgmInterval !== null) return;
@@ -496,22 +496,79 @@ class SoundSystem {
 
     this.isBgmPlaying = true;
 
-    // Peaceful fantasy forest melody in G major / E minor for Menu and Level 1
-    // Mysterious dark pulse in D minor for Level 2
+    // Track melodies:
+    // Level 1 / Menu: Peaceful forest in G major / E minor
     const l1Notes = [
       392.0, 440.0, 493.88, 587.33, 493.88, 440.0, 392.0, 329.63, 349.23, 392.0, 440.0, 523.25,
       440.0, 392.0, 329.63, 293.66,
     ];
 
+    // Level 2: Dark eerie pulse in D minor
     const l2Notes = [
       293.66, 311.13, 349.23, 293.66, 261.63, 293.66, 349.23, 392.0, 440.0, 392.0, 349.23, 311.13,
       293.66, 220.0, 246.94, 261.63,
     ];
 
+    // Level 3: Swamp / mysterious mist hollows (pentatonic minor)
+    const l3Notes = [
+      261.63, 311.13, 349.23, 392.0, 466.16, 392.0, 349.23, 311.13,
+      293.66, 349.23, 392.0, 440.0, 523.25, 440.0, 392.0, 349.23,
+    ];
+
+    // Level 4: Volcanic magma chasm (fast, chromatic drive)
+    const l4Notes = [
+      220.0, 246.94, 261.63, 329.63, 311.13, 261.63, 246.94, 220.0,
+      329.63, 349.23, 392.0, 440.0, 415.3, 392.0, 329.63, 293.66,
+    ];
+
+    // Level 5: Shadow citadel (gothic cadence)
+    const l5Notes = [
+      196.0, 246.94, 293.66, 392.0, 369.99, 293.66, 246.94, 196.0,
+      220.0, 261.63, 329.63, 440.0, 392.0, 329.63, 261.63, 220.0,
+    ];
+
+    // Level 6: Void Core Sanctuary (heroic climactic boss theme)
+    const l6Notes = [
+      293.66, 349.23, 440.0, 587.33, 523.25, 440.0, 493.88, 587.33,
+      659.25, 587.33, 523.25, 440.0, 392.0, 440.0, 493.88, 587.33,
+    ];
+
     const menuNotes = [329.63, 392.0, 493.88, 587.33, 659.25, 587.33, 493.88, 392.0];
 
-    const melody = track === 'menu' ? menuNotes : track === 1 ? l1Notes : l2Notes;
-    const tempo = track === 2 ? 260 : 360; // ms per 8th note
+    let melody = menuNotes;
+    let tempo = 360;
+    let waveType: OscillatorType = 'triangle';
+
+    if (track === 'menu') {
+      melody = menuNotes;
+      tempo = 360;
+      waveType = 'triangle';
+    } else if (track === 1) {
+      melody = l1Notes;
+      tempo = 340;
+      waveType = 'triangle';
+    } else if (track === 2) {
+      melody = l2Notes;
+      tempo = 270;
+      waveType = 'sawtooth';
+    } else if (track === 3) {
+      melody = l3Notes;
+      tempo = 310;
+      waveType = 'triangle';
+    } else if (track === 4) {
+      melody = l4Notes;
+      tempo = 240;
+      waveType = 'sawtooth';
+    } else if (track === 5) {
+      melody = l5Notes;
+      tempo = 280;
+      waveType = 'square';
+    } else if (track === 6) {
+      melody = l6Notes;
+      tempo = 230;
+      waveType = 'sawtooth';
+    }
+
     let step = 0;
 
     const tick = () => {
@@ -525,17 +582,17 @@ class SoundSystem {
       // Lead melodic note
       const osc = this.registerNode(this.ctx.createOscillator());
       const gain = this.ctx.createGain();
-      osc.type = track === 2 ? 'sawtooth' : 'triangle';
+      osc.type = waveType;
       osc.frequency.setValueAtTime(freq, now);
 
-      const vol = track === 2 ? 0.04 : 0.06;
+      const vol = track === 1 || track === 'menu' ? 0.06 : 0.045;
       gain.gain.setValueAtTime(vol, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + (tempo / 1000) * 0.9);
 
       // Low pass filter for soft fantasy feel
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(track === 2 ? 900 : 1400, now);
+      filter.frequency.setValueAtTime(track === 1 || track === 'menu' ? 1400 : 1000, now);
 
       osc.connect(filter);
       filter.connect(gain);

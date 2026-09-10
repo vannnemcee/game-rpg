@@ -131,7 +131,7 @@ export interface Particle {
 }
 
 export interface LevelConfig {
-  levelNumber: 1 | 2;
+  levelNumber: 1 | 2 | 3 | 4 | 5 | 6;
   title: string;
   subtitle: string;
   description: string;
@@ -143,6 +143,7 @@ export interface LevelConfig {
   portalY: number;
   ambientLight: string;
   hasFog: boolean;
+  theme?: 'forest' | 'dark' | 'swamp' | 'volcano' | 'citadel' | 'sanctuary';
   enemies: Enemy[];
   collectibles: Collectible[];
   obstacles: Obstacle[];

@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GameScreen, Player, InventoryItem, GameStats, Direction, LevelConfig } from './types';
-import { createLevel1, createLevel2 } from './game/levels';
+import {
+  createLevel1,
+  createLevel2,
+  createLevel3,
+  createLevel4,
+  createLevel5,
+  createLevel6,
+} from './game/levels';
 import { sound } from './game/sound';
 import { SplashScreen } from './components/SplashScreen';
 import { PixelHUD } from './components/PixelHUD';
@@ -10,7 +17,7 @@ import { LevelCompleteModal, GameOverModal, VictoryModal } from './components/En
 
 export default function App() {
   const [gameScreen, setGameScreen] = useState<GameScreen>('SPLASH');
-  const [currentLevel, setCurrentLevel] = useState<1 | 2>(1);
+  const [currentLevel, setCurrentLevel] = useState<number>(1);
   const [levelConfig, setLevelConfig] = useState<LevelConfig>(() => createLevel1());
 
   // Player State
@@ -21,7 +28,7 @@ export default function App() {
     vy: 0,
     width: 32,
     height: 32,
-    speed: 3.4,
+    speed: 4.0,
     hp: 100,
     maxHp: 100,
     facing: 'right',
@@ -182,22 +189,40 @@ export default function App() {
     setIsInventoryOpen(false);
   };
 
-  // Level 1 Complete
+  const getLevelConfig = useCallback((lvl: number): LevelConfig => {
+    switch (lvl) {
+      case 1: return createLevel1();
+      case 2: return createLevel2();
+      case 3: return createLevel3();
+      case 4: return createLevel4();
+      case 5: return createLevel5();
+      case 6: return createLevel6();
+      default: return createLevel1();
+    }
+  }, []);
+
+  // Level Complete
   const handleLevelComplete = () => {
     setGameScreen('LEVEL_COMPLETE');
   };
 
-  // Continue to Level 2 (Monster Forest)
-  const handleContinueToLevel2 = () => {
-    setCurrentLevel(2);
-    const l2 = createLevel2();
-    setLevelConfig(l2);
+  // Continue to Next Level (Up to Level 6)
+  const handleContinueNextLevel = () => {
+    const nextLvl = currentLevel + 1;
+    if (nextLvl > 6) {
+      handleVictory();
+      return;
+    }
 
-    // Reposition player at start of Level 2 with restored health
+    setCurrentLevel(nextLvl);
+    const nextCfg = getLevelConfig(nextLvl);
+    setLevelConfig(nextCfg);
+
+    // Reposition player at start of next level with health restore boost
     setPlayer((prev) => ({
       ...prev,
-      x: l2.playerStartX,
-      y: l2.playerStartY,
+      x: nextCfg.playerStartX,
+      y: nextCfg.playerStartY,
       hp: Math.max(prev.hp, 80),
       facing: 'right',
       animState: 'idle',
@@ -216,7 +241,7 @@ export default function App() {
 
   // Try Again (Restart current level)
   const handleTryAgain = () => {
-    const cfg = currentLevel === 1 ? createLevel1() : createLevel2();
+    const cfg = getLevelConfig(currentLevel);
     setLevelConfig(cfg);
 
     setPlayer((prev) => ({
@@ -234,7 +259,7 @@ export default function App() {
     setIsPaused(false);
   };
 
-  // Victory (Reached end of Level 2)
+  // Victory (Reached end of Level 6)
   const handleVictory = () => {
     setGameScreen('VICTORY');
   };
@@ -313,11 +338,12 @@ export default function App() {
         />
       )}
 
-      {/* 4. Level 1 Complete Transition Modal */}
+      {/* 4. Level Complete Transition Modal */}
       {gameScreen === 'LEVEL_COMPLETE' && (
         <LevelCompleteModal
-          onContinue={handleContinueToLevel2}
+          onContinue={handleContinueNextLevel}
           stats={stats}
+          currentLevel={currentLevel}
         />
       )}
 

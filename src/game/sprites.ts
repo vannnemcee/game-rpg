@@ -548,47 +548,126 @@ export class SpriteRenderer {
       }
 
       case 'river': {
-        // Flowing Water tile
+        // Flowing Water or Magma tile
         const waterW = obs.width;
         const waterH = obs.height;
-        ctx.fillStyle = '#1e5f7a';
-        ctx.fillRect(0, 0, waterW, waterH);
+        const variant = obs.variant || 0;
 
-        // Water currents animation
-        for (let y = 4; y < waterH; y += 14) {
-          const shift = (time * 25 + y * 4) % (waterW + 20) - 10;
-          ctx.fillStyle = '#2d84a8';
-          ctx.fillRect(shift, y, 16, 3);
-          ctx.fillStyle = '#5ac3e8';
-          ctx.fillRect(shift + 3, y + 1, 8, 1);
+        if (variant === 2) {
+          // Molten Magma River (Level 4 & 6)
+          ctx.fillStyle = '#6b1408';
+          ctx.fillRect(0, 0, waterW, waterH);
+          for (let y = 4; y < waterH; y += 14) {
+            const shift = (time * 18 + y * 4) % (waterW + 20) - 10;
+            ctx.fillStyle = '#b83014';
+            ctx.fillRect(shift, y, 20, 4);
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(shift + 4, y + 1, 10, 2);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(shift + 7, y + 1.5, 4, 1);
+          }
+        } else if (variant === 1) {
+          // Murky Swamp River (Level 3)
+          ctx.fillStyle = '#16382b';
+          ctx.fillRect(0, 0, waterW, waterH);
+          for (let y = 4; y < waterH; y += 14) {
+            const shift = (time * 15 + y * 4) % (waterW + 20) - 10;
+            ctx.fillStyle = '#235944';
+            ctx.fillRect(shift, y, 16, 3);
+            ctx.fillStyle = '#34d399';
+            ctx.fillRect(shift + 3, y + 1, 6, 1);
+          }
+        } else {
+          // Clear Forest River (Level 1)
+          ctx.fillStyle = '#1e5f7a';
+          ctx.fillRect(0, 0, waterW, waterH);
+          for (let y = 4; y < waterH; y += 14) {
+            const shift = (time * 25 + y * 4) % (waterW + 20) - 10;
+            ctx.fillStyle = '#2d84a8';
+            ctx.fillRect(shift, y, 16, 3);
+            ctx.fillStyle = '#5ac3e8';
+            ctx.fillRect(shift + 3, y + 1, 8, 1);
+          }
         }
         break;
       }
 
       case 'bridge': {
-        // Wooden Bridge across river
+        // Robust Pixel Art Bridge (Walkable Wooden & Stone Deck)
         const bw = obs.width;
         const bh = obs.height;
-        // Main planks
-        ctx.fillStyle = '#422817';
+        const isHorizontal = bw >= bh;
+
+        // Shadow cast on water beneath bridge
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.fillRect(2, bh - 2, bw - 4, 6);
+
+        // Foundation support beams
+        ctx.fillStyle = '#261408';
         ctx.fillRect(0, 0, bw, bh);
 
-        // Horizontal wooden planks
-        for (let y = 0; y < bh; y += 8) {
-          ctx.fillStyle = '#633e24';
-          ctx.fillRect(2, y + 1, bw - 4, 6);
-          ctx.fillStyle = '#7a4f2f';
-          ctx.fillRect(4, y + 2, bw - 8, 2);
-          // Nail dots
-          ctx.fillStyle = '#261408';
-          ctx.fillRect(4, y + 3, 2, 2);
-          ctx.fillRect(bw - 6, y + 3, 2, 2);
-        }
+        if (isHorizontal) {
+          // Horizontal bridge crossing north-south river
+          // Vertical planks
+          for (let x = 2; x < bw - 2; x += 10) {
+            const isAlt = (Math.floor(x / 10) % 2) === 0;
+            ctx.fillStyle = isAlt ? '#58341e' : '#683d23';
+            ctx.fillRect(x, 4, 8, bh - 8);
+            // Wood grain highlight
+            ctx.fillStyle = '#7a4a2b';
+            ctx.fillRect(x + 1, 6, 6, 2);
+            // Iron nails near top and bottom edges
+            ctx.fillStyle = '#1c0f06';
+            ctx.fillRect(x + 3, 7, 2, 2);
+            ctx.fillRect(x + 3, bh - 9, 2, 2);
+          }
 
-        // Bridge wooden railings
-        ctx.fillStyle = '#301c0f';
-        ctx.fillRect(0, 0, 3, bh);
-        ctx.fillRect(bw - 3, 0, 3, bh);
+          // Top protective wooden railing along north riverbank
+          ctx.fillStyle = '#381f10';
+          ctx.fillRect(0, 0, bw, 6);
+          ctx.fillStyle = '#4f2b16';
+          ctx.fillRect(0, 1, bw, 3);
+          for (let px = 2; px < bw; px += 24) {
+            ctx.fillStyle = '#261408';
+            ctx.fillRect(px, 0, 6, 8);
+            ctx.fillStyle = '#6a3b20';
+            ctx.fillRect(px + 1, 0, 4, 6);
+          }
+
+          // Bottom protective wooden railing along south riverbank
+          ctx.fillStyle = '#381f10';
+          ctx.fillRect(0, bh - 6, bw, 6);
+          ctx.fillStyle = '#4f2b16';
+          ctx.fillRect(0, bh - 5, bw, 3);
+          for (let px = 2; px < bw; px += 24) {
+            ctx.fillStyle = '#261408';
+            ctx.fillRect(px, bh - 8, 6, 8);
+            ctx.fillStyle = '#6a3b20';
+            ctx.fillRect(px + 1, bh - 7, 4, 6);
+          }
+        } else {
+          // Vertical bridge crossing east-west river
+          for (let y = 2; y < bh - 2; y += 10) {
+            const isAlt = (Math.floor(y / 10) % 2) === 0;
+            ctx.fillStyle = isAlt ? '#58341e' : '#683d23';
+            ctx.fillRect(4, y, bw - 8, 8);
+            ctx.fillStyle = '#7a4a2b';
+            ctx.fillRect(6, y + 1, 2, 6);
+            ctx.fillStyle = '#1c0f06';
+            ctx.fillRect(7, y + 3, 2, 2);
+            ctx.fillRect(bw - 9, y + 3, 2, 2);
+          }
+          // Left railing
+          ctx.fillStyle = '#381f10';
+          ctx.fillRect(0, 0, 6, bh);
+          ctx.fillStyle = '#4f2b16';
+          ctx.fillRect(1, 0, 3, bh);
+          // Right railing
+          ctx.fillStyle = '#381f10';
+          ctx.fillRect(bw - 6, 0, 6, bh);
+          ctx.fillStyle = '#4f2b16';
+          ctx.fillRect(bw - 5, 0, 3, bh);
+        }
         break;
       }
 

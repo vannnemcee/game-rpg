@@ -237,7 +237,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       <header className="relative z-10 w-full max-w-5xl px-6 pt-6 flex justify-between items-center">
         <div className="flex items-center gap-2 px-3 py-1.5 bg-black/60 border-2 border-emerald-800 rounded-sm text-xs text-emerald-300 font-pixel">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-          RPG PIXEL ART v1.0
+          FOXWOOD TALE v1.2 • 6 LEVELS
         </div>
 
         <div className="flex items-center gap-3">
@@ -307,7 +307,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
       {/* Footer Info */}
       <footer className="relative z-10 w-full py-4 text-center text-emerald-400/80 text-[11px] font-pixel bg-black/50 border-t border-emerald-900/50">
-        Tekan <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">WASD</kbd> atau <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">Panah</kbd> untuk bergerak • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">SPASI</kbd> Serang • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">E</kbd> Minum Potion • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">I</kbd> Tas
+        Tekan <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">WASD</kbd> / <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">Panah</kbd> Bergerak • Tahan <kbd className="px-1.5 py-0.5 bg-amber-900 border border-amber-600 rounded text-amber-200">SHIFT</kbd> Lari Cepat • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">SPASI</kbd> Serang • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">E</kbd> Potion • <kbd className="px-1.5 py-0.5 bg-emerald-900 border border-emerald-600 rounded text-white">I</kbd> Tas
       </footer>
 
       {/* How To Play Modal */}
@@ -316,7 +316,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
           <div className="pixel-box max-w-lg w-full p-6 text-white relative">
             <h2 className="text-lg font-pixel text-amber-400 mb-4 pb-2 border-b-2 border-emerald-800 flex items-center gap-2">
               <Shield className="w-5 h-5 text-amber-400" />
-              PANDUAN BERMAIN
+              PANDUAN BERMAIN v1.2
             </h2>
 
             <div className="space-y-4 text-xs font-silkscreen text-emerald-100">
@@ -324,6 +324,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 <div className="font-pixel text-amber-300 mb-2">🎮 KONTROL PERMAINAN:</div>
                 <ul className="space-y-1.5">
                   <li>• <strong className="text-white">W, A, S, D</strong> atau <strong className="text-white">Tombol Panah</strong>: Menggerakkan Rubah</li>
+                  <li>• <strong className="text-amber-300">SHIFT</strong>: Lari Cepat / Sprint (+50% kecepatan gerak)</li>
                   <li>• <strong className="text-white">SPASI / Klik Mouse</strong>: Menebas pedang menyerang monster</li>
                   <li>• <strong className="text-white">E</strong>: Meminum Ramuan Health Potion (+50 HP)</li>
                   <li>• <strong className="text-white">I / B</strong>: Buka & Tutup Tas Inventory</li>
@@ -332,10 +333,14 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               </div>
 
               <div className="bg-black/40 p-3 border border-emerald-900 rounded">
-                <div className="font-pixel text-amber-300 mb-2">🗺️ MISI 2 LEVEL:</div>
+                <div className="font-pixel text-amber-300 mb-2">🗺️ PETUALANGAN 6 LEVEL:</div>
                 <ul className="space-y-1.5">
-                  <li>• <strong className="text-emerald-300">Level 1 (Forest Journey)</strong>: Pelajari dasar permainan, kumpulkan koin & kristal, lewati jembatan sungai, dan capai portal pertama!</li>
-                  <li>• <strong className="text-red-400">Level 2 (Monster Forest)</strong>: Hutan gelap yang penuh kabut! Monster langsung menyerang di titik awal. Waspadai Monster Bayangan yang sangat cepat!</li>
+                  <li>• <strong className="text-emerald-300">Level 1 (Forest Journey)</strong>: Pelajari dasar permainan, kumpulkan koin & kristal, lewati jembatan sungai, dan capai portal.</li>
+                  <li>• <strong className="text-purple-300">Level 2 (Monster Forest)</strong>: Hutan gelap berkabut dengan monster bayangan yang lincah.</li>
+                  <li>• <strong className="text-teal-300">Level 3 (Lembah Kabut Beracun)</strong>: Rawa beracun, jembatan rawa hijau, dan monster jamur berspora.</li>
+                  <li>• <strong className="text-orange-400">Level 4 (Reruntuhan Obsidian & Magma)</strong>: Ngarai lahar membara dan monster api.</li>
+                  <li>• <strong className="text-indigo-300">Level 5 (Benteng Bayangan Kuno)</strong>: Benteng pilar kuno dengan monster ksatria bayangan elit.</li>
+                  <li>• <strong className="text-rose-400">Level 6 (Puncak Inti Foxwood)</strong>: Final Showdown! Hadapi Lord of the Void Core dan selamatkan rimba!</li>
                 </ul>
               </div>
 

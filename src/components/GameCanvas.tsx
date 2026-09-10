@@ -307,9 +307,12 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
           moveY *= 0.7071;
         }
 
-        // Move Player with solid obstacle collision checks
-        const nextX = p.x + moveX * p.speed;
-        const nextY = p.y + moveY * p.speed;
+        // Move Player with solid obstacle collision checks (with sprint support)
+        const isSprinting = Boolean(keys['ShiftLeft'] || keys['ShiftRight']);
+        const currentSpeed = isSprinting ? p.speed * 1.4 : p.speed;
+
+        const nextX = p.x + moveX * currentSpeed;
+        const nextY = p.y + moveY * currentSpeed;
 
         // Check horizontal collision
         let canMoveX = true;
@@ -517,7 +520,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
         if (portalDist < 48 && !isTransitioningRef.current) {
           isTransitioningRef.current = true;
-          if (levelConfig.levelNumber === 1) {
+          if (levelConfig.levelNumber < 6) {
             sound.playLevelComplete();
             onLevelComplete();
           } else {
@@ -576,31 +579,57 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
       ctx.translate(-Math.floor(cameraRef.current.x + shakeX), -Math.floor(cameraRef.current.y + shakeY));
 
-      // 1. Terrain Base (Lush forest grass for L1, Dark mysterious soil for L2)
-      ctx.fillStyle = levelConfig.levelNumber === 1 ? '#183820' : '#0e1814';
+      // 1. Terrain Base & Theme
+      let bgCol = '#183820';
+      let pathCol = '#2b4d2e';
+      let pebbleCol = '#3a663d';
+
+      if (levelConfig.levelNumber === 2) {
+        bgCol = '#0e1814';
+        pathCol = '#1a2920';
+        pebbleCol = '#273d30';
+      } else if (levelConfig.levelNumber === 3) {
+        bgCol = '#102219'; // Swamp Moss
+        pathCol = '#1b3829';
+        pebbleCol = '#235944';
+      } else if (levelConfig.levelNumber === 4) {
+        bgCol = '#1a0d0b'; // Obsidian Volcanic Rock
+        pathCol = '#2d1814';
+        pebbleCol = '#47211b';
+      } else if (levelConfig.levelNumber === 5) {
+        bgCol = '#0f111a'; // Shadow Citadel Floor
+        pathCol = '#1d2133';
+        pebbleCol = '#2e354f';
+      } else if (levelConfig.levelNumber === 6) {
+        bgCol = '#0a0817'; // Void Sanctuary Obsidian
+        pathCol = '#191538';
+        pebbleCol = '#2b2357';
+      }
+
+      ctx.fillStyle = bgCol;
       ctx.fillRect(0, 0, levelConfig.mapWidth, levelConfig.mapHeight);
 
-      // 2. Dirt Trails & Pathways
-      ctx.fillStyle = levelConfig.levelNumber === 1 ? '#2b4d2e' : '#1a2920';
-      // Winding main road through forest
+      // 2. Dirt Trails & Pathways (Aligned with bridge deck at Y ~ 555)
+      ctx.fillStyle = pathCol;
       ctx.beginPath();
-      ctx.ellipse(levelConfig.mapWidth / 2, 540, levelConfig.mapWidth / 2 - 80, 70, 0, 0, Math.PI * 2);
+      ctx.ellipse(levelConfig.mapWidth / 2, 555, levelConfig.mapWidth / 2 - 60, 75, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Earth path pebbles
+      // Earth path pebbles & detail dots
       for (let px = 80; px < levelConfig.mapWidth; px += 45) {
-        ctx.fillStyle = levelConfig.levelNumber === 1 ? '#3a663d' : '#273d30';
-        ctx.fillRect(px, 520 + Math.sin(px * 0.02) * 20, 4, 3);
-        ctx.fillRect(px + 12, 550 + Math.cos(px * 0.03) * 15, 3, 2);
+        ctx.fillStyle = pebbleCol;
+        ctx.fillRect(px, 535 + Math.sin(px * 0.02) * 20, 4, 3);
+        ctx.fillRect(px + 12, 565 + Math.cos(px * 0.03) * 15, 3, 2);
       }
 
       // 3. Draw Obstacles (Sorted by Y for correct isometric depth layering)
+      // Note: Bridges are walkable platforms rendered at y: -50 (above river -100, but below player and monsters)
       const renderables: ({ y: number; render: () => void })[] = [];
 
       // Add Obstacles
       obstaclesRef.current.forEach((obs) => {
         renderables.push({
-          y: obs.type === 'river' ? -100 : obs.y + obs.height,
+          y: obs.type === 'river' ? -100 : obs.type === 'bridge' ? -50 : obs.y + obs.height,
           render: () => SpriteRenderer.drawObstacle(ctx, obs, animTimer),
         });
       });

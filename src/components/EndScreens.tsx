@@ -7,9 +7,44 @@ import { sound } from '../game/sound';
 interface LevelCompleteModalProps {
   onContinue: () => void;
   stats: GameStats;
+  currentLevel: number;
 }
 
-export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({ onContinue, stats }) => {
+const NEXT_LEVEL_INFO: Record<number, { title: string; warning: string; desc: string }> = {
+  1: {
+    title: 'LEVEL 2 (MONSTER FOREST)',
+    warning: '⚠️ PERINGATAN: Di Level 2 (Monster Forest), monster akan langsung menyerang di area awal!',
+    desc: 'Kiko berhasil menyeberangi sungai dan mencapai portal kuno menuju hutan bagian dalam!',
+  },
+  2: {
+    title: 'LEVEL 3 (LEMBAH KABUT BERACUN)',
+    warning: '⚠️ PERINGATAN: Di Lembah Rawa, kabut hijau menyelimuti area. Waspadai spora jamur!',
+    desc: 'Kiko berhasil menembus kegelapan Monster Forest dan menemukan jalan ke rawa berkabut!',
+  },
+  3: {
+    title: 'LEVEL 4 (OBSIDIAN & MAGMA)',
+    warning: '⚠️ PERINGATAN: Hawa panas magma membakar! Monster Obsidian memiliki cakar yang tajam!',
+    desc: 'Kiko selamat dari rawa beracun dan kini tiba di ngarai lahar menyala!',
+  },
+  4: {
+    title: 'LEVEL 5 (BENTENG BAYANGAN KUNO)',
+    warning: '⚠️ PERINGATAN: Gerbang benteng dijaga monster elit berkekuatan tinggi!',
+    desc: 'Ngarai lahar berhasil diseberangi! Kiko kini memasuki benteng kuno peninggalan raja rimba!',
+  },
+  5: {
+    title: 'LEVEL 6 (PUNCAK INTI FOXWOOD)',
+    warning: '🔥 PERINGATAN FINAL: Puncak Inti dijaga Lord of the Void! Tembus dan selamatkan rimba Foxwood!',
+    desc: 'Benteng bayangan telah ditaklukkan! Satu langkah lagi menuju Gerbang Suci Penyelamat Foxwood!',
+  },
+};
+
+export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({ onContinue, stats, currentLevel }) => {
+  const nextInfo = NEXT_LEVEL_INFO[currentLevel] || {
+    title: `LEVEL ${currentLevel + 1}`,
+    warning: '⚠️ Bersiaplah untuk rintangan berikutnya!',
+    desc: 'Kiko berhasil menyelesaikan area ini!',
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 select-none animate-fade-in">
       <div className="pixel-box-gold max-w-md w-full p-6 text-center text-white relative">
@@ -18,13 +53,13 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({ onContin
         </div>
 
         <h2 className="text-2xl font-pixel text-amber-300 mb-1 drop-shadow">
-          LEVEL COMPLETE!
+          LEVEL {currentLevel} SELESAI!
         </h2>
         <p className="text-xs font-silkscreen text-emerald-200 mb-5">
-          Kiko berhasil menyeberangi sungai dan mencapai portal kuno menuju hutan bagian dalam!
+          {nextInfo.desc}
         </p>
 
-        {/* Level 1 Recap */}
+        {/* Level Recap */}
         <div className="bg-black/50 p-4 border-2 border-amber-800/80 rounded mb-6 text-xs font-pixel space-y-2 text-left">
           <div className="flex justify-between text-amber-200">
             <span>🪙 KOIN DIKUMPULKAN:</span>
@@ -41,7 +76,7 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({ onContin
         </div>
 
         <div className="p-2.5 mb-5 bg-purple-950/80 border border-purple-600/80 rounded text-[11px] font-silkscreen text-purple-200">
-          ⚠️ PERINGATAN: Di Level 2 (Monster Forest), monster akan langsung menyerang di area awal!
+          {nextInfo.warning}
         </div>
 
         <button
@@ -51,7 +86,7 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({ onContin
           }}
           className="w-full pixel-btn-amber py-3.5 text-xs md:text-sm font-pixel flex items-center justify-center gap-2 tracking-wider cursor-pointer"
         >
-          <span>MASUK LEVEL 2 (MONSTER FOREST)</span>
+          <span>MASUK {nextInfo.title}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
@@ -63,7 +98,7 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({ onContin
 interface GameOverModalProps {
   onTryAgain: () => void;
   onMainMenu: () => void;
-  levelNumber: 1 | 2;
+  levelNumber: number;
 }
 
 export const GameOverModal: React.FC<GameOverModalProps> = ({
