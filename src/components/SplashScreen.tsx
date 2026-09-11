@@ -253,7 +253,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       <header className="relative z-10 w-full max-w-5xl px-3 sm:px-6 pt-1 sm:pt-4 flex justify-between items-center flex-shrink-0">
         <div className="flex items-center gap-2 px-2.5 py-1 bg-black/60 border-2 border-emerald-800 rounded-sm text-[10px] sm:text-xs text-emerald-300 font-pixel">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
-          FOXWOOD TALE v1.5 • KING SLIME BOSS
+          FOXWOOD TALE v1.5 •
         </div>
 
         <div className="flex items-center gap-2 sm:gap-2.5">
@@ -510,7 +510,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             <div className="flex items-center justify-between pb-2.5 mb-3 border-b-2 border-emerald-800">
               <h2 className="text-sm sm:text-base font-pixel text-amber-400 flex items-center gap-2">
                 <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
-                PANDUAN BERMAIN v1.5
+                PANDUAN BERMAIN FOXWOOD TALES
               </h2>
               <button
                 id="close-how-to-play-x-btn"
